@@ -78,7 +78,6 @@ class RatingsListCreateView(ListCreateAPIView):
     permission_classes = [
         permissions.AllowAny
     ]
-    pagination_class = None
     serializer_class = RatingsSerializer
     search_fields = ['=movie_id__id']
 

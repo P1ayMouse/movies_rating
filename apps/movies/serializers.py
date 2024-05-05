@@ -22,7 +22,7 @@ class MovieSerializer(serializers.ModelSerializer):
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ['id', 'imdb_id', 'name', 'birth_year', 'death_year']
+        fields = ['id', 'imdb_id', 'name', 'birth_year', 'death_year', 'known_for_titles']
 
 
 class PersonMovieSerializer(serializers.ModelSerializer):

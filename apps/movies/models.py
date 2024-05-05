@@ -23,6 +23,7 @@ class Person(models.Model):
     name = models.CharField(_('Name'), max_length=255)
     birth_year = models.DateField(_('Birth year'), null=True)
     death_year = models.DateField(_('Death year'), null=True)
+    known_for_titles = ArrayField(models.CharField(_('Known for titles'), max_length=255, null=True))
 
 
 class PersonMovie(models.Model):

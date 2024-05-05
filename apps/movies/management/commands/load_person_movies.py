@@ -19,20 +19,20 @@ class Command(BaseCommand):
         with open(file_name) as f:
             csv_data = csv.reader(f, delimiter=options.get('delimiter', '\t'))
 
-            movie_ids = set(Movie.objects.values_list('imdb_id', flat=True))
-            person_ids = set(Person.objects.values_list('imdb_id', flat=True))
+            movies_ids = set(Movie.objects.values_list('imdb_id', flat=True))
+            people_ids = set(Person.objects.values_list('imdb_id', flat=True))
 
             with transaction.atomic():
+
                 for row in csv_data:
-                    imdb_id = row[0]
-                    if imdb_id not in movie_ids:
-                        continue  # Skip if movie not found in database
 
+                    movie_id = row[0]
                     person_id = row[2]
-                    if person_id not in person_ids:
-                        continue  # Skip if person not found in database
 
-                    movie = Movie.objects.get(imdb_id=imdb_id)
+                    if movie_id not in movies_ids and person_id not in people_ids:
+                        continue
+
+                    movie = Movie.objects.get(imdb_id=movie_id)
                     person = Person.objects.get(imdb_id=person_id)
 
                     row_data = {
@@ -44,9 +44,7 @@ class Command(BaseCommand):
                         'characters': ast.literal_eval(row[5]) if row[5] != '\\N' else [],
                     }
 
-                    # Use update_or_create to avoid duplicates
-                    person_movie, created = PersonMovie.objects.update_or_create(
-                        movie_id=movie, person_id=person, defaults=row_data
-                    )
+                    person_movie, created = PersonMovie.objects.update_or_create(movie_id=movie, person_id=person,
+                                                                                 defaults=row_data)
 
                     print(row_data)

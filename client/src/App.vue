@@ -25,14 +25,12 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div class="row">
   <header>
     <nav class="navbar navbar-expand-lg bg-light text-font">
       <div class="container-fluid">
         <!-- Collapsible wrapper -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <a href="/movies/" style="color: black; text-decoration: none; font-size: 24px"> Ithillel IMDB </a>
+          <a href="/movies/" style="color: black; text-decoration: none; font-size: 28px"> Diploma IMDB </a>
         </div>
         <!-- Search form -->
         <div class="navbar-collapse" style="align-items: center">
@@ -60,8 +58,6 @@ export default {
       </div>
     </nav>
   </header>
-    </div>
-  </div>
 
   <RouterView />
 </template>

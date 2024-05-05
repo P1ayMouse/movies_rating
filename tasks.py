@@ -6,12 +6,12 @@ from invoke import task
 @task
 def runit(ctx):
     ctx.run('./manage.py collectstatic --noinput')
-    ctx.run('./manage.py compilemessages')
+    # ctx.run('./manage.py compilemessages')
     ctx.run('./manage.py migrate')
 
     uwsgi_command = ('uwsgi '
                      ' --module "django.core.wsgi:get_wsgi_application()"'
-                     ' --master '
+                     ' --master'
                      ' --pidfile=/tmp/project-master.pid'
                      ' --http=0.0.0.0:8000'
                      ' --processes=5'

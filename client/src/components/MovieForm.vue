@@ -77,7 +77,7 @@ export default {
         </div>
       </div>
     </div>
-    <div style="width: 70%;">
+    <div style="width: 60%;">
       <table class="table table-striped" v-if="persons.length > 0">
         <thead>
         <tr>
