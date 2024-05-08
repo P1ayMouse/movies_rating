@@ -11,7 +11,7 @@ export default {
     }
   },
   async mounted() {
-    const token = localStorage.getItem('lesson-9-access')
+    const token = localStorage.getItem('movies_rating-access')
     let user = null
 
     const response = await fetch('/api/v1/auth/user-info/', {
@@ -31,7 +31,7 @@ export default {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({'refresh': localStorage.getItem('lesson-9-refresh')})
+            body: JSON.stringify({'refresh': localStorage.getItem('movies_rating-refresh')})
           }
       )
     }

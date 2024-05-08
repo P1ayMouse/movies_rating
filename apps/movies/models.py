@@ -36,6 +36,6 @@ class PersonMovie(models.Model):
 
 
 class Rating(models.Model):
-    movie_id = models.ForeignKey(Movie, on_delete=models.PROTECT)
+    movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
     average_rating = models.FloatField(_('Rating'))
     num_votes = models.IntegerField(_('Num votes'))

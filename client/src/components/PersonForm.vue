@@ -40,7 +40,10 @@ export default {
   methods: {
     goToMoviePage(movieId) {
       this.$router.push(`/movies/movie/${movieId}`);
-    }
+    },
+    viewOnIMDb() {
+      window.open(`https://www.imdb.com/name/${this.person.imdb_id}`, '_blank');
+    },
   }
 
 };
@@ -58,12 +61,16 @@ export default {
 
   <div class="text-font m-4" v-if="personLoaded">
     <div class="d-flex align-items">
-      <img src="./icons/none_image.png" class="card-img-top m-3 " style="width:300px;">
+      <div>
+        <img src="./icons/none_image.png" class="card-img-top m-3 " style="width:300px;">
+        <div class="style-button mt-3">
+          <button @click="viewOnIMDb">View on IMDb</button>
+        </div>
+      </div>
       <div class="m-4">
         <h4> {{ person.name }} </h4>
         <span style="font-size: 12px;" v-if="person.birth_year"> {{ person.birth_year ? person.birth_year.slice(0, 4) : '' }}  </span>
         <span style="font-size: 12px;" v-if="person.death_year && person.birth_year"> - {{ person.death_year.slice(0, 4) }} </span>
-
       </div>
     </div>
     <div style="width: 70%;">

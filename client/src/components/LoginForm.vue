@@ -33,8 +33,8 @@ export default {
       }
       else {
         const response_data = await response.json()
-        localStorage.setItem('lesson-9-access', response_data.access)
-        localStorage.setItem('lesson-9-refresh', response_data.refresh)
+        localStorage.setItem('movies_rating-access', response_data.access)
+        localStorage.setItem('movies_rating-refresh', response_data.refresh)
         this.$router.push('/profile')
       }
     }

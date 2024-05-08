@@ -6,22 +6,38 @@ from apps.movies.models import Movie, Person, PersonMovie, Rating
 from apps.movies.serializers import MovieSerializer, PersonSerializer, PersonMovieSerializer, RatingsSerializer
 
 
+from django.db.models import Q
+from rest_framework import permissions
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+
+from apps.movies.models import Movie
+from apps.movies.serializers import MovieSerializer
+
+
 class MovieListCreateView(ListCreateAPIView):
     permission_classes = [
         permissions.AllowAny
     ]
     serializer_class = MovieSerializer
-    search_fields = ['^name', 'genres', '=imdb_id']
     filter_backends = [OrderingFilter, SearchFilter]
-    ordering_fields = ['rating__average_rating', ]
+    search_fields = ['^name', '=imdb_id']
+    ordering_fields = ['rating__average_rating']
 
     def get_queryset(self):
         queryset = Movie.objects.all()
+        genres = self.request.query_params.get('genres')
+
+        if genres:
+            genres_list = genres.split(',')
+            queryset = queryset.filter(genres__contains=genres_list)
+            queryset = queryset.filter(genres__len=len(genres_list))
 
         if order_by := self.request.query_params.get('order_by'):
             queryset = queryset.order_by(order_by)
 
         return queryset
+
 
 
 class MoviesRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
@@ -91,5 +107,8 @@ class RatingsListCreateView(ListCreateAPIView):
 
 
 class RatingsRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        permissions.AllowAny
+    ]
     serializer_class = RatingsSerializer
     queryset = Rating.objects.all()

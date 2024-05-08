@@ -1,19 +1,19 @@
 <template>
-  <div v-if="!userLoaded" style="text-decoration: none; color: black; font-family: Comic Sans MS, sans-serif;">
+  <div v-if="!userLoaded" class="text-font">
     Loading...
   </div>
-  <div v-else-if="user !== null" class="dropdown" style="text-decoration: none; color: black; font-family: Comic Sans MS, sans-serif;">
-    <a class="dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+  <div v-else-if="user !== null" class="dropdown text-font" style="text-decoration: none; color: black;">
+    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
       <img src="./icons/account-circle-512.webp" height="30" class="m-2">
       {{ user.username }}
-    </a>
+    </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
       <li><a class="dropdown-item" @click="doEditAccount()">Edit Account</a></li>
       <hr>
       <li><a class="dropdown-item" @click="doLogOut()">Log Out</a></li>
     </ul>
   </div>
-  <div v-else style="text-decoration: none; color: black; font-family: Comic Sans MS, sans-serif;">
+  <div v-else class="text-font">
     <RouterLink to="/login/"> Log In </RouterLink>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default {
     }
   },
   async mounted() {
-    const token = localStorage.getItem('lesson-9-access')
+    const token = localStorage.getItem('movies_rating-access')
     let user = null
 
     const response = await fetch('/api/v1/auth/user-info/', {
@@ -48,16 +48,16 @@ export default {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({'refresh': localStorage.getItem('lesson-9-refresh')})
+            body: JSON.stringify({'refresh': localStorage.getItem('movies_rating-refresh')})
           }
       )
       if (newTokenResponse.status === 200 ) {
-        localStorage.setItem('lesson-9-access', (await newTokenResponse.json()).access)
+        localStorage.setItem('movies_rating-access', (await newTokenResponse.json()).access)
         // retry last api call
       }
       else {
-        localStorage.removeItem('lesson-9-access')
-        localStorage.removeItem('lesson-9-refresh')
+        localStorage.removeItem('movies_rating-access')
+        localStorage.removeItem('movies_rating-refresh')
       }
     }
     else {
@@ -69,8 +69,8 @@ export default {
   },
   methods: {
     doLogOut() {
-      localStorage.removeItem('lesson-9-access')
-      localStorage.removeItem('lesson-9-refresh')
+      localStorage.removeItem('movies_rating-access')
+      localStorage.removeItem('movies_rating-refresh')
       this.user = null
       this.$router.push('/login')
     },

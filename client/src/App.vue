@@ -29,14 +29,14 @@ export default {
     <nav class="navbar navbar-expand-lg bg-light text-font">
       <div class="container-fluid">
         <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <a href="/movies/" style="color: black; text-decoration: none; font-size: 28px"> Diploma IMDB </a>
+        <div class="collapse navbar-collapse">
+          <a href="/movies/" class="site-name" style="color: black; text-decoration: none; font-size: 28px"> Diploma IMDB </a>
         </div>
         <!-- Search form -->
-        <div class="navbar-collapse" style="align-items: center">
+        <div class="navbar-collapse d-flex align-items-center">
           <form class="input-group w-auto d-flex">
             <input
-                class="form-control"
+                class="form-control search-input"
                 placeholder="Search"
                 type="text"
                 v-model="search"
@@ -51,9 +51,10 @@ export default {
               Submit
             </button>
           </form>
+          <div class="ms-auto">
+            <UserBadge />
+          </div>
         </div>
-
-        <UserBadge />
 
       </div>
     </nav>
@@ -66,5 +67,24 @@ export default {
 .text-font {
   font-family: Comic Sans MS, sans-serif;
 }
-</style>
 
+/* Responsive styles */
+@media screen and (max-width: 375px) {
+  .search-input {
+    min-width: 150px;
+    max-width: 200px;
+  }
+}
+
+@media screen and (max-width: 667px) {
+  .site-name {
+    display: none;
+  }
+
+  .search-input {
+    min-width: 200px;
+    max-width: 250px;
+  }
+}
+
+</style>
