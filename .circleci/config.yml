@@ -1,0 +1,41 @@
+version: 2.1
+
+# Define the jobs we want to run for this project
+jobs:
+  prospector:
+    docker:
+      - image: playmouse/movies_rating-deploy
+    steps:
+      - checkout
+      - restore_cache:
+          key: python-dev-requirements
+      - run: pip install -r movies_rating/requirements-dev.txt
+      - save_cache:
+          key: python-dev-requirements-3.9
+          paths:
+            - /usr/local/lib/python3.9/site-packages
+      # - run: prospector movies_rating/apps
+
+  tests:
+    docker:
+      - image: playmouse/movies_rating-deploy
+    steps:
+      - checkout
+      - restore_cache:
+          key: python-dev-requirements
+      - run: pip install -r movies_rating/requirements-dev.txt
+      - save_cache:
+          key: python-dev-requirements-3.9
+          paths:
+            - /usr/local/lib/python3.9/site-packages
+      # - run: coverage run ./movies_rating/manage.py test movies_rating/
+      # - run: coverage report --fail-under=80
+
+
+
+# Orchestrate our job run sequence
+workflows:
+  check_and_deploy:
+    jobs:
+      - prospector
+      - tests
