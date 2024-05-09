@@ -9,12 +9,12 @@ jobs:
       - checkout
       - restore_cache:
           key: python-dev-requirements
-      - run: pip install -r movies_rating/requirements-dev.txt
+      - run: pip install -r ./movies_rating/requirements-dev.txt
       - save_cache:
           key: python-dev-requirements-3.9
           paths:
             - /usr/local/lib/python3.9/site-packages
-      - run: prospector movies_rating/apps
+      - run: prospector ./movies_rating/apps
 
 
 
