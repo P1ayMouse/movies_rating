@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.db.models import Avg
 
 from apps.movies.models import Movie, Person, PersonMovie, Rating
 

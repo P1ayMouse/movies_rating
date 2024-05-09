@@ -38,4 +38,3 @@ class Command(BaseCommand):
                     ratings, created = Rating.objects.update_or_create(movie_id=movie, defaults=row_data)
 
                     print(row_data)
-

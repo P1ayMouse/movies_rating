@@ -1,7 +1,6 @@
 import csv
 
 from django.core.management import BaseCommand
-from datetime import datetime
 
 from apps.movies.models import Movie, Rating
 

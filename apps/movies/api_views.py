@@ -1,18 +1,10 @@
-from rest_framework import permissions, filters
-from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-
 from apps.movies.models import Movie, Person, PersonMovie, Rating
 from apps.movies.serializers import MovieSerializer, PersonSerializer, PersonMovieSerializer, RatingsSerializer
 
 
-from django.db.models import Q
 from rest_framework import permissions
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-
-from apps.movies.models import Movie
-from apps.movies.serializers import MovieSerializer
 
 
 class MovieListCreateView(ListCreateAPIView):
@@ -37,7 +29,6 @@ class MovieListCreateView(ListCreateAPIView):
             queryset = queryset.order_by(order_by)
 
         return queryset
-
 
 
 class MoviesRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
