@@ -24,6 +24,7 @@ ignore-patterns:
 
 uses:
   - django
+  - celery
 
 pycodestyle:
   full: true
