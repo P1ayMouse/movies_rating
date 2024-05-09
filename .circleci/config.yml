@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   prospector:
     docker:
-      - image: cimg/python:3.9
+      - image: playmouse/movies_rating-deploy
     steps:
       - checkout
       - restore_cache:
@@ -16,8 +16,27 @@ jobs:
             - /usr/local/lib/python3.9/site-packages
 #      - run: prospector apps -X
 
+  deploy_dev:
+    docker:
+      - image: playmouse/movies_rating-deploy
+    steps:
+      - checkout
+      - run: pip install boto3 pexpect
+
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:MYPMtB73kkNfZuLq8ryxgO2PgKXmSn2XMzq/FC9VLHU"
+
+      - run: python deploy.py
+
 # Orchestrate our job run sequence
 workflows:
-  check_code:
+  check_and_deploy:
     jobs:
       - prospector
+      - deploy_dev:
+          requires: ['prospector',]
+          filters:
+            branches:
+              only:
+                - main
