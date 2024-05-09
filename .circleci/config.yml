@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   prospector:
     docker:
-      - image: circleci/python:3.9
+      - image: cimg/python:3.9
     steps:
       - checkout
       - restore_cache:
@@ -16,13 +16,8 @@ jobs:
             - /usr/local/lib/python3.9/site-packages
       - run: prospector apps
 
-
-
-
-
 # Orchestrate our job run sequence
 workflows:
   check_code:
     jobs:
       - prospector
-#      - tests
