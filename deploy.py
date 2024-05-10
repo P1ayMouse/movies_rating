@@ -53,6 +53,7 @@ def deploy_host(instance):
     expect.cmd('git reset --hard')
     expect.cmd('git checkout {}'.format(deploy_version))
     expect.cmd('{} stop'.format(docker_compose))
+    expect.cmd('chmod +x manage.py')
     expect.cmd('{} up -d'.format(docker_compose))
     expect.cmd('exit', expect='logout')
 
