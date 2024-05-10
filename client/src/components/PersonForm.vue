@@ -32,6 +32,7 @@ export default {
       }));
 
       console.log(this.person);
+      document.title = `${this.person.name} (${this.person.imdb_id})`;
       this.personLoaded = true;
     } catch (error) {
       console.error(error);

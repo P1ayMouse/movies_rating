@@ -48,6 +48,8 @@ export default {
 
               console.log(this.movie, this.persons, this.rating, this.topThree);
 
+              document.title = `${this.movie.name} (${this.movie.imdb_id})`;
+
               this.dataLoaded = true;
             })
             .catch(error => {

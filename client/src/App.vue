@@ -78,7 +78,9 @@ export default {
 
 @media screen and (max-width: 667px) {
   .site-name {
-    display: none;
+    display: block;
+    font-size: 24px;
+    margin-right: 10px;
   }
 
   .search-input {

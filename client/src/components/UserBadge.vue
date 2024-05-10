@@ -8,8 +8,9 @@
       {{ user.username }}
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-      <li><a class="dropdown-item" @click="doEditAccount()">Edit Account</a></li>
-      <hr>
+      <li><a class="dropdown-item" style="margin-bottom: 0.5rem;" @click="doEditAccount()">Edit Account</a></li>
+      <li><a class="dropdown-item" @click="doMoviesList()">Movies List</a></li>
+      <hr style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
       <li><a class="dropdown-item" @click="doLogOut()">Log Out</a></li>
     </ul>
   </div>
@@ -76,6 +77,9 @@ export default {
     },
     doEditAccount() {
       this.$router.push('/profile')
+    },
+    doMoviesList() {
+      this.$router.push('/movies')
     }
   }
 }

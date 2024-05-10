@@ -1,5 +1,7 @@
 <script >
 
+import axios from "axios";
+
 export default {
   name: "LoginForm",
 
@@ -54,7 +56,7 @@ export default {
         <br>
         <div class="mb-4">
           <label class="form-label">e-mail:</label>
-          <input name="email" class="form-control" v-model="user.email" placeholder="Input your email" required />
+          <input type="email" name="email" class="form-control" v-model="user.email" placeholder="Input your email" required />
         </div>
         <div class="mb-4">
           <label class="form-label">password:</label>
@@ -74,11 +76,16 @@ export default {
 </template>
 
 <style scoped>
+.form-control {
+  width: 100%;
+}
+.col-2 {
+  width: 400px;
+}
 .alert-danger {
   font-size: 1em;
   padding: 0.5em;
   display: inline-block;
-  text-transform: capitalize;
 }
 .text-font {
   text-decoration: none;

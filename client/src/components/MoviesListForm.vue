@@ -16,6 +16,7 @@ export default {
   },
   async mounted() {
     await this.loadMovies();
+    document.title = 'Diploma IMDB';
   },
 
   methods: {
@@ -109,36 +110,43 @@ export default {
                 <span aria-hidden="true"> &laquo; </span>
               </a>
             </li>
+            <template v-if="totalPages >= 10">
+              <!-- Показуємо сторінки від 1 до 5 -->
+              <template v-if="page <= 4 || totalPages <= 5">
+                <template v-for="pageNum in [1, 2, 3, 4, 5, 6, '...', totalPages]" :key="pageNum">
+                  <li class="page-item" :class="{active: page === pageNum}">
+                    <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
+                  </li>
+                </template>
+              </template>
 
-            <!-- Показуємо сторінки від 1 до 5 -->
-            <template v-if="page <= 4 || totalPages <= 5">
-              <template v-for="pageNum in [1, 2, 3, 4, 5, 6, '...', totalPages]" :key="pageNum">
-                <li class="page-item" :class="{active: page === pageNum}">
-                  <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
-                </li>
+              <!-- Показуємо поточну сторінку та останні чотири сторінки -->
+              <template v-else-if="page > totalPages - 4">
+                <template v-for="pageNum in [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]" :key="pageNum">
+                  <li class="page-item" :class="{active: page === pageNum}">
+                    <a class="page-link" href="#" @click="changePage(pageNum)" v-if="pageNum !== '...'">{{ pageNum }}</a>
+                    <span class="page-link" v-else>{{ pageNum }}</span>
+                  </li>
+                </template>
+              </template>
+
+              <!-- Показуємо середину списку сторінок -->
+              <template v-else>
+                <template v-for="pageNum in [1, '...', page - 1, page, page + 1, '...', totalPages]" :key="pageNum">
+                  <li class="page-item" :class="{active: page === pageNum}">
+                    <a class="page-link" href="#" @click="changePage(pageNum)" v-if="pageNum !== '...'">{{ pageNum }}</a>
+                    <span class="page-link" v-else>{{ pageNum }}</span>
+                  </li>
+                </template>
               </template>
             </template>
-
-            <!-- Показуємо поточну сторінку та останні чотири сторінки -->
-            <template v-else-if="page > totalPages - 4">
-              <template v-for="pageNum in [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]" :key="pageNum">
-                <li class="page-item" :class="{active: page === pageNum}">
-                  <a class="page-link" href="#" @click="changePage(pageNum)" v-if="pageNum !== '...'">{{ pageNum }}</a>
-                  <span class="page-link" v-else>{{ pageNum }}</span>
-                </li>
-              </template>
-            </template>
-
-            <!-- Показуємо середину списку сторінок -->
             <template v-else>
-              <template v-for="pageNum in [1, '...', page - 1, page, page + 1, '...', totalPages]" :key="pageNum">
-                <li class="page-item" :class="{active: page === pageNum}">
-                  <a class="page-link" href="#" @click="changePage(pageNum)" v-if="pageNum !== '...'">{{ pageNum }}</a>
-                  <span class="page-link" v-else>{{ pageNum }}</span>
-                </li>
-              </template>
+        <template v-for="pageNum in totalPages" :key="pageNum">
+          <li class="page-item" :class="{active: page === pageNum}">
+            <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
+          </li>
+        </template>
             </template>
-
             <li class="page-item" :class="{disabled: page === totalPages}">
               <a class="page-link" href="#" aria-label="Next" @click="changePage(page + 1)">
                 <span aria-hidden="true"> &raquo; </span>

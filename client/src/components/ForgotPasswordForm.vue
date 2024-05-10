@@ -47,9 +47,14 @@ export default {
   display: inline-block;
   text-transform: capitalize;
 }
+
 .text-font {
   text-decoration: none;
   font-family: Comic Sans MS, sans-serif;
   color: black;
+}
+
+.col-2 {
+  width: 400px;
 }
 </style>

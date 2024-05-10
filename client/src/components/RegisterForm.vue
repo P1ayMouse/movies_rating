@@ -1,4 +1,6 @@
 <script>
+import axios from "axios";
+
 export default {
   name: "RegisterForm",
 
@@ -13,6 +15,9 @@ export default {
     async onUserRegister(e) {
       e.preventDefault();
       this.formError = null
+
+      await axios.get("/sanctum/csrf-cookie")
+
       const response = await fetch( "/api/v1/auth/user-registration/", {
         method: "POST",
         headers: {
@@ -93,6 +98,12 @@ export default {
 </template>
 
 <style scoped>
+.form-control {
+  width: 100%;
+}
+.col-2 {
+  width: 400px;
+}
 .alert-danger {
   font-size: 1em;
   padding: 0.5em;
