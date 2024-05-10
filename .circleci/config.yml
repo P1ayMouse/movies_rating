@@ -22,7 +22,7 @@ jobs:
     steps:
       - checkout
       - run: pip install boto3 pexpect
-      - run: chmod +x movies_rating/manage.py
+      - run: chmod +x manage.py
 
       - add_ssh_keys:
           fingerprints:
