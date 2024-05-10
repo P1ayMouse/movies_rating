@@ -31,7 +31,7 @@ export default {
 
       this.search = this.$route.params.search ? this.$route.params.search : ''
 
-      const response_movies = await fetch(`/api/v1/movies/?limit=${this.limit}&offset=${(this.page-1) * this.limit}&search=${this.search}`, {
+      const response_movies = await fetch(`/api/v1/movies/?limit=${this.limit}&offset=${(this.page-1) * this.limit}&search=${this.search}&ordering=id`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -50,18 +50,6 @@ export default {
     totalPages() {
       return Math.ceil(this.count / this.limit);
     },
-    visiblePages() {
-      const visiblePageCount = 5; // Кількість видимих сторінок
-      let startPage = Math.max(1, this.page - Math.floor(visiblePageCount / 2));
-      let endPage = Math.min(this.totalPages, startPage + visiblePageCount - 1);
-
-      // Переконайтеся, що ми відображаємо правильну кількість сторінок, навіть якщо `totalPages` менше `visiblePageCount`
-      if (endPage - startPage + 1 < visiblePageCount) {
-        startPage = Math.max(1, endPage - visiblePageCount + 1);
-      }
-
-      return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-    }
   },
 
 
@@ -83,7 +71,7 @@ export default {
           <div class="card h-100">
             <router-link :to="{name: 'movie', params: {id: movie.id}}" style="text-decoration: none; color: black">
               <div class="card-body">
-                <img src="./icons/none_image.png" class="card-img-top mb-2">
+                <img :src="movie.poster ? movie.poster : '/src/components/icons/none_image.png'" class="card-img-top mb-2">
                 <div class="ms-2">
                   <p class="card-title mb-0" style="font-weight: bold; font-size: 18px;">{{ movie.name }}</p>
                   <div class="card-text mt-1" style="font-size: 12px">
@@ -104,23 +92,26 @@ export default {
       <br><br>
       <nav aria-label="Page navigation" v-if="totalPages > 1">
         <div class="d-flex justify-content-center">
-          <ul class="pagination">
+          <!-- Large pagination for screens SM (576px) and up -->
+          <ul class="pagination d-none d-sm-flex">
+            <!-- Previous Page -->
             <li class="page-item" :class="{disabled: page === 1}">
               <a class="page-link" href="#" aria-label="Previous" @click="changePage(page - 1)">
                 <span aria-hidden="true"> &laquo; </span>
               </a>
             </li>
-            <template v-if="totalPages >= 10">
-              <!-- Показуємо сторінки від 1 до 5 -->
-              <template v-if="page <= 4 || totalPages <= 5">
-                <template v-for="pageNum in [1, 2, 3, 4, 5, 6, '...', totalPages]" :key="pageNum">
+
+            <!-- Page Numbers -->
+            <template v-if="totalPages >= 8">
+              <!-- Show first 5 pages -->
+              <template v-if="page <= 3 || totalPages <= 4">
+                <template v-for="pageNum in [1, 2, 3, 4, 5, '...', totalPages]" :key="pageNum">
                   <li class="page-item" :class="{active: page === pageNum}">
                     <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
                   </li>
                 </template>
               </template>
-
-              <!-- Показуємо поточну сторінку та останні чотири сторінки -->
+              <!-- Show current page and last four pages -->
               <template v-else-if="page > totalPages - 4">
                 <template v-for="pageNum in [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]" :key="pageNum">
                   <li class="page-item" :class="{active: page === pageNum}">
@@ -129,8 +120,7 @@ export default {
                   </li>
                 </template>
               </template>
-
-              <!-- Показуємо середину списку сторінок -->
+              <!-- Show middle part of the list of pages -->
               <template v-else>
                 <template v-for="pageNum in [1, '...', page - 1, page, page + 1, '...', totalPages]" :key="pageNum">
                   <li class="page-item" :class="{active: page === pageNum}">
@@ -141,12 +131,68 @@ export default {
               </template>
             </template>
             <template v-else>
-        <template v-for="pageNum in totalPages" :key="pageNum">
-          <li class="page-item" :class="{active: page === pageNum}">
-            <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
-          </li>
-        </template>
+              <template v-for="pageNum in totalPages" :key="pageNum">
+                <li class="page-item" :class="{active: page === pageNum}">
+                  <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
+                </li>
+              </template>
             </template>
+
+            <!-- Next Page -->
+            <li class="page-item" :class="{disabled: page === totalPages}">
+              <a class="page-link" href="#" aria-label="Next" @click="changePage(page + 1)">
+                <span aria-hidden="true"> &raquo; </span>
+              </a>
+            </li>
+          </ul>
+
+          <!-- Small pagination for screens smaller than SM (576px) -->
+          <ul class="pagination pagination-sm d-flex d-sm-none">
+            <!-- Previous Page -->
+            <li class="page-item" :class="{disabled: page === 1}">
+              <a class="page-link" href="#" aria-label="Previous" @click="changePage(page - 1)">
+                <span aria-hidden="true"> &laquo; </span>
+              </a>
+            </li>
+
+            <!-- Page Numbers -->
+            <template v-if="totalPages >= 8">
+              <!-- Show first 5 pages -->
+              <template v-if="page <= 3 || totalPages <= 4">
+                <template v-for="pageNum in [1, 2, 3, 4, 5, '...', totalPages]" :key="pageNum">
+                  <li class="page-item" :class="{active: page === pageNum}">
+                    <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
+                  </li>
+                </template>
+              </template>
+              <!-- Show current page and last four pages -->
+              <template v-else-if="page > totalPages - 4">
+                <template v-for="pageNum in [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]" :key="pageNum">
+                  <li class="page-item" :class="{active: page === pageNum}">
+                    <a class="page-link" href="#" @click="changePage(pageNum)" v-if="pageNum !== '...'">{{ pageNum }}</a>
+                    <span class="page-link" v-else>{{ pageNum }}</span>
+                  </li>
+                </template>
+              </template>
+              <!-- Show middle part of the list of pages -->
+              <template v-else>
+                <template v-for="pageNum in [1, '...', page - 1, page, page + 1, '...', totalPages]" :key="pageNum">
+                  <li class="page-item" :class="{active: page === pageNum}">
+                    <a class="page-link" href="#" @click="changePage(pageNum)" v-if="pageNum !== '...'">{{ pageNum }}</a>
+                    <span class="page-link" v-else>{{ pageNum }}</span>
+                  </li>
+                </template>
+              </template>
+            </template>
+            <template v-else>
+              <template v-for="pageNum in totalPages" :key="pageNum">
+                <li class="page-item" :class="{active: page === pageNum}">
+                  <a class="page-link" href="#" @click="changePage(pageNum)">{{ pageNum }}</a>
+                </li>
+              </template>
+            </template>
+
+            <!-- Next Page -->
             <li class="page-item" :class="{disabled: page === totalPages}">
               <a class="page-link" href="#" aria-label="Next" @click="changePage(page + 1)">
                 <span aria-hidden="true"> &raquo; </span>

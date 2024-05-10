@@ -14,7 +14,7 @@ class MovieListCreateView(ListCreateAPIView):
     serializer_class = MovieSerializer
     filter_backends = [OrderingFilter, SearchFilter]
     search_fields = ['^name', '=imdb_id']
-    ordering_fields = ['rating__average_rating']
+    ordering_fields = ['rating__average_rating', 'id']
 
     def get_queryset(self):
         queryset = Movie.objects.all()
@@ -44,7 +44,6 @@ class PersonListCreateView(ListCreateAPIView):
         permissions.AllowAny
     ]
     serializer_class = PersonSerializer
-    search_fields = ['=id', '=imdb_id']
 
     def get_queryset(self):
         queryset = Person.objects.all()
@@ -56,6 +55,9 @@ class PersonListCreateView(ListCreateAPIView):
 
 
 class PersonsRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        permissions.AllowAny
+    ]
     serializer_class = PersonSerializer
     queryset = Person.objects.all()
 
@@ -77,6 +79,9 @@ class PersonMovieListCreateView(ListCreateAPIView):
 
 
 class PersonMoviesRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        permissions.AllowAny
+    ]
     serializer_class = PersonMovieSerializer
     queryset = PersonMovie.objects.all()
 

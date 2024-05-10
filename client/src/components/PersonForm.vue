@@ -9,27 +9,28 @@ export default {
   },
   async mounted () {
     this.personLoaded = false
-    const urlPersonMovie = `/api/v1/movies/persons/?search=${this.$route.params.id}`;
+    const urlPersonMovie = `/api/v1/movies/persons/${this.$route.params.id}`;
 
     try {
       const response = await fetch(urlPersonMovie);
       const data = await response.json();
 
-      this.person = data.results[0];
+      this.person = data;
 
-      // Отримання даних про known_for_titles
-      await Promise.all(this.person.known_for_titles.map(async (imdb_id) => {
-        const movieUrl = `/api/v1/movies/?search=${imdb_id}`;
-        const movieResponse = await fetch(movieUrl);
-        const movieData = await movieResponse.json();
-        if (movieData.results.length > 0) {
-          // Якщо фільм знайдено, додайте його до об'єкту person
-          if (!this.person.knownForMovies) {
-            this.person.knownForMovies = [];
+      if (this.person.known_for_titles.length > 0) {
+        await Promise.all(this.person.known_for_titles.map(async (imdb_id) => {
+          const movieUrl = `/api/v1/movies/?search=${imdb_id}`;
+          const movieResponse = await fetch(movieUrl);
+          const movieData = await movieResponse.json();
+          if (movieData.results.length > 0) {
+            // Якщо фільм знайдено, додайте його до об'єкту person
+            if (!this.person.knownForMovies) {
+              this.person.knownForMovies = [];
+            }
+            this.person.knownForMovies.push(movieData.results[0]);
           }
-          this.person.knownForMovies.push(movieData.results[0]);
-        }
-      }));
+        }));
+      }
 
       console.log(this.person);
       document.title = `${this.person.name} (${this.person.imdb_id})`;
@@ -63,7 +64,7 @@ export default {
   <div class="text-font m-4" v-if="personLoaded">
     <div class="d-flex align-items">
       <div>
-        <img src="./icons/none_image.png" class="card-img-top m-3 " style="width:300px;">
+        <img :src="person.photo ? person.photo : '/src/components/icons/none_image.png'" class="card-img-top m-3" style="width:300px;">
         <div class="style-button mt-3">
           <button @click="viewOnIMDb">View on IMDb</button>
         </div>

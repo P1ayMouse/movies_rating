@@ -37,7 +37,7 @@ export default {
       ]).then(data => {
         const genres = data[0].genres.join(',');
 
-        const urlTopThree = `/api/v1/movies/?limit=3&genres=${genres}&ordering=-rating__average_rating`;
+        const urlTopThree = `/api/v1/movies/?limit=3&genre=${genres}&ordering=-rating__average_rating&ordering=id`;
 
         fetch(urlTopThree).then(response => response.json())
             .then(topThreeData => {
@@ -92,13 +92,13 @@ export default {
   <div class="text-font m-4" v-if="dataLoaded">
     <div class="d-flex align-items">
       <div>
-        <img src="./icons/none_image.png" class="card-img-top m-3" style="width:300px;">
+        <img :src="movie.poster ? movie.poster : '/src/components/icons/none_image.png'" class="card-img-top m-3" style="width:300px;">
         <div class="d-flex align-items-center justify-content-center">
           <star-rating :max-rating="10" :star-size="25" :show-rating="false" :rating="movie.average_rating" :increment="0.01" :read-only="true"/>
         </div>
         <p style="text-align: center; font-size: 14px;" class="mt-2" v-if="rating">based on {{ rating.num_votes }} rates</p>
         <div class="style-button mt-3">
-          <button @click="toggleRatingCard">Close/Open top 3 by genre</button>
+          <button class="rating-card-button" @click="toggleRatingCard">Close/Open top 3 by genre</button>
         </div>
         <div class="style-button mt-3">
           <button @click="viewOnIMDb">View on IMDb</button>
@@ -144,7 +144,7 @@ export default {
             <div v-for="(movie, index) in topThree" @click="goToMovie(movie.id)" style="cursor: pointer;">
               <div class="card">
                 <div class="card-body">
-                  <img src="./icons/none_image.png" class="card-img-top d-block mx-auto mb-2" :alt="movie.name">
+                  <img :src="movie.poster ? movie.poster : '/src/components/icons/none_image.png'" class="card-img-top d-block mx-auto mb-2" :alt="movie.name">
                   <div class="ms-2">
                     <p class="card-title mb-0" style="font-weight: bold; font-size: 14px;">{{ movie.name }}</p>
                     <div class="card-text mt-1" style="font-size: 10px">
@@ -201,7 +201,7 @@ export default {
   border-radius: 10px !important;
 }
 
-@media screen and (max-height: 1040px), (max-width: 900px) {
+@media screen and (max-height: 1350px), (max-width: 900px) {
   .rating-card, .rating-card-button {
     display: none;
   }
@@ -235,5 +235,6 @@ export default {
 .style-button {
   display: flex;
   justify-content: center;
+  margin-bottom: 20px;
 }
 </style>

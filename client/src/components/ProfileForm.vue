@@ -53,7 +53,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="text-font">
     <div v-if="formError" class="alert alert-danger" role="alert">
       {{ formError }}
     </div>
@@ -61,19 +61,19 @@ export default {
       <form @submit.prevent="onUserEditProfile" class="col-12 col-md-6">
         <br>
         <div class="mb-4">
-          <label class="form-label">E-mail:</label>
+          <label class="form-label">e-mail:</label>
           <input type="email" name="email" class="form-control" v-model="user.email" readonly placeholder="Input your email">
         </div>
         <div class="mb-4">
-          <label class="form-label">Username:</label>
+          <label class="form-label">username:</label>
           <input name="username" class="form-control" v-model="user.username" placeholder="Input your username">
         </div>
         <div class="mb-4">
-          <label class="form-label">Password:</label>
+          <label class="form-label">password:</label>
           <input type="password" name="password" class="form-control" v-model="user.password" placeholder="Input your password">
         </div>
         <div class="mb-4">
-          <label class="form-label">Repeat password:</label>
+          <label class="form-label">repeat password:</label>
           <input type="password" name="password2" class="form-control" v-model="user.password2" placeholder="Repeat your password">
         </div>
         <div class="d-flex justify-content-center">
@@ -87,5 +87,9 @@ export default {
 <style scoped>
   .col-12.col-md-6 {
     width: 400px;
+  }
+  .text-font {
+    text-decoration: none;
+    font-family: Comic Sans MS, sans-serif;
   }
 </style>

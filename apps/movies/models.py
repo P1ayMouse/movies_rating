@@ -16,6 +16,7 @@ class Movie(models.Model):
     is_adult = models.BooleanField(_('Is adult'), default=False)
     year = models.DateField(_('Year'), null=True)
     genres = ArrayField(models.CharField(_('Genres'), max_length=255))
+    poster = models.CharField(_('Poster'), max_length=255, null=True)
 
 
 class Person(models.Model):
@@ -24,11 +25,12 @@ class Person(models.Model):
     birth_year = models.DateField(_('Birth year'), null=True)
     death_year = models.DateField(_('Death year'), null=True)
     known_for_titles = ArrayField(models.CharField(_('Known for titles'), max_length=255, null=True))
+    photo = models.CharField(_('Photo'), max_length=255, null=True)
 
 
 class PersonMovie(models.Model):
-    movie_id = models.ForeignKey(Movie, on_delete=models.PROTECT)
-    person_id = models.ForeignKey(Person, on_delete=models.PROTECT)
+    movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
     order = models.IntegerField(_('Order'))
     category = models.CharField(_('Category'), max_length=255)
     job = models.CharField(_('Job'), max_length=255, null=True)

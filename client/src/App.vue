@@ -28,13 +28,12 @@ export default {
   <header>
     <nav class="navbar navbar-expand-lg bg-light text-font">
       <div class="container-fluid">
-        <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse">
-          <a href="/movies/" class="site-name" style="color: black; text-decoration: none; font-size: 28px"> Diploma IMDB </a>
-        </div>
+        <!-- Site name -->
+        <a href="/movies/" class="site-name"> Diploma IMDB </a>
+
         <!-- Search form -->
-        <div class="navbar-collapse d-flex align-items-center">
-          <form class="input-group w-auto d-flex">
+        <div class="d-flex justify-content-center flex-grow-1">
+          <form class="input-group" style="max-width: 400px;">
             <input
                 class="form-control search-input"
                 placeholder="Search"
@@ -51,11 +50,12 @@ export default {
               Submit
             </button>
           </form>
-          <div class="ms-auto">
-            <UserBadge />
-          </div>
         </div>
 
+        <!-- User badge -->
+        <div class=" d-flex justify-content-center user-badge">
+          <UserBadge />
+        </div>
       </div>
     </nav>
   </header>
@@ -68,25 +68,31 @@ export default {
   font-family: Comic Sans MS, sans-serif;
 }
 
-/* Responsive styles */
-@media screen and (max-width: 375px) {
-  .search-input {
-    min-width: 150px;
-    max-width: 200px;
-  }
+.site-name {
+  margin-bottom: 10px;
+  margin-right: 30px;
+  color: black;
+  text-decoration: none;
+  font-size: 28px
+}
+.search-input {
+  min-width: 200px;
+  max-width: 250px;
 }
 
+/* Responsive styles */
 @media screen and (max-width: 667px) {
   .site-name {
-    display: block;
-    font-size: 24px;
-    margin-right: 10px;
+    margin-bottom: 20px;
   }
 
-  .search-input {
-    min-width: 200px;
-    max-width: 250px;
+  .container-fluid {
+    display: flex;
+    flex-direction: column;
+  }
+  .user-badge{
+  margin-top: 10px;
+
   }
 }
-
 </style>
