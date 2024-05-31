@@ -5,7 +5,7 @@ from apps.movies.models import Movie
 
 class Command(BaseCommand):
     def handle(self, **options):
-        movies = Movie.objects.all()
+        movies = Movie.objects.filter(poster__isnull=True)
 
         for movie in movies:
             api_url = f"https://api.themoviedb.org/3/find/{movie.imdb_id}?external_source=imdb_id&language=uk"
@@ -26,10 +26,14 @@ class Command(BaseCommand):
                     if poster_path:
                         movie.poster = f"https://image.tmdb.org/t/p/w600_and_h900_bestv2{poster_path}"
                         movie.save()
-                        print(f"Updated poster for {movie.name}")
+                        print(f"Updated poster for {movie.name}, {movie.id}")
                     else:
-                        print(f"No poster found for {movie.name}")
+                        movie.poster = "None"
+                        movie.save()
+                        print(f"No poster found for {movie.name}, {movie.id}")
                 else:
-                    print(f"No movie results found for {movie.imdb_id}")
+                    movie.poster = "None"
+                    movie.save()
+                    print(f"No movie results found for {movie.imdb_id}, {movie.id}")
             except requests.RequestException as e:
                 print(f"Request failed for {movie.imdb_id}: {e}")

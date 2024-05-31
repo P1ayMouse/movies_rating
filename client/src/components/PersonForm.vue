@@ -97,7 +97,7 @@ export default {
           <div class="row">
             <div class="col-md-4 person-photo-center text-center">
               <q-img
-                  :src="person.photo ? person.photo : '/src/components/icons/none_image.png'"
+                  :src="(person.photo && person.photo !== 'None') ? person.photo : '/src/components/icons/none_image.png'"
                   class="person-photo rounded-borders"
                   :ratio="0.67"
                   :img-class="'high-quality'"

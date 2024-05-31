@@ -126,7 +126,7 @@ export default {
           <div class="row">
             <div class="col-12 col-md-4 text-center">
               <q-img
-                  :src="movie.poster ? movie.poster : '/src/components/icons/none_image.png'"
+                  :src="(movie.poster && movie.poster !== 'None') ? movie.poster : '/src/components/icons/none_image.png'"
                   class="movie-poster rounded-borders"
                   :ratio="0.67"
                   :img-class="'high-quality'"

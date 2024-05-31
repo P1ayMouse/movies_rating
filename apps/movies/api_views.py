@@ -44,7 +44,7 @@ class PersonListCreateView(ListCreateAPIView):
         permissions.AllowAny
     ]
     serializer_class = PersonSerializer
-
+    search_fields = ['^name', '=imdb_id']
     def get_queryset(self):
         queryset = Person.objects.all()
 
@@ -67,7 +67,8 @@ class PersonMovieListCreateView(ListCreateAPIView):
         permissions.AllowAny
     ]
     serializer_class = PersonMovieSerializer
-    search_fields = ['=movie_id__id']
+    search_fields = ['=movie_id__id', ]
+
 
     def get_queryset(self):
         queryset = PersonMovie.objects.all()

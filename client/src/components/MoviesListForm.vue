@@ -87,7 +87,7 @@ export default {
         <div v-for="(movie, index) in movies" :key="movie.id" class="movie-card-container">
           <q-card class="movie-card">
             <router-link :to="{ name: 'movie', params: { id: movie.id } }" class="movie-link">
-              <q-img :src="movie.poster ? movie.poster : '/src/components/icons/none_image.png'" class="card-img-top">
+              <q-img :src="(movie.poster && movie.poster !== 'None') ? movie.poster : '/src/components/icons/none_image.png'" class="card-img-top">
                 <template v-slot:error>
                   <q-icon name="image_off" size="5em" />
                 </template>
