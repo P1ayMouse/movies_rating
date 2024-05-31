@@ -1,24 +1,3 @@
-<template>
-  <div v-if="!userLoaded" class="text-font">
-    Loading...
-  </div>
-  <div v-else-if="user !== null" class="dropdown text-font" style="text-decoration: none; color: black;">
-    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-      <img src="./icons/account-circle-512.webp" height="30" class="m-2">
-      {{ user.username }}
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-      <li><a class="dropdown-item" style="margin-bottom: 0.5rem;" @click="doEditAccount()">Edit Account</a></li>
-      <li><a class="dropdown-item" @click="doMoviesList()">Movies List</a></li>
-      <hr style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
-      <li><a class="dropdown-item" @click="doLogOut()">Log Out</a></li>
-    </ul>
-  </div>
-  <div v-else class="text-font">
-    <RouterLink to="/login/"> Log In </RouterLink>
-  </div>
-</template>
-
 <script>
 export default {
   name: "UserBadge",
@@ -43,7 +22,6 @@ export default {
       user = await response.json()
     }
     else if (response.status === 403) {
-      // try to renew token
       const newTokenResponse = await fetch('/api/v1/auth/refresh/', {
             method: 'POST',
             headers: {
@@ -54,15 +32,22 @@ export default {
       )
       if (newTokenResponse.status === 200 ) {
         localStorage.setItem('movies_rating-access', (await newTokenResponse.json()).access)
-        // retry last api call
-      }
-      else {
+        const retryResponse = await fetch('/api/v1/auth/user-info/', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('movies_rating-access')}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (retryResponse.status === 200) {
+          user = await retryResponse.json()
+        }
+      } else {
         localStorage.removeItem('movies_rating-access')
         localStorage.removeItem('movies_rating-refresh')
       }
-    }
-    else {
-      user = {email: 'Error'}
+    } else {
+      user = { email: 'Error' }
     }
 
     this.user = user
@@ -80,12 +65,63 @@ export default {
     },
     doMoviesList() {
       this.$router.push('/movies')
+    },
+    goToLogin() {
+      this.$router.push('/login')
     }
   }
 }
-
 </script>
 
-<style scoped>
+<template>
+  <div v-if="!userLoaded" class="text-font">
+    <q-spinner-dots color="black" size="64px" />
+  </div>
+  <div v-else-if="user !== null">
+    <q-btn-dropdown
+        flat
+        color="black"
+        no-caps
+        class="user-dropdown"
+    >
+      <template v-slot:label>
+        <q-icon name="account_circle" size="md" class="q-mr-sm" />
+        {{ user.username }}
+      </template>
+      <q-list style="min-width: 150px; overflow: hidden;">
+        <q-item clickable v-ripple @click="doEditAccount">
+          <q-item-section> Edit Account </q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="doMoviesList">
+          <q-item-section> Movies List </q-item-section>
+        </q-item>
+        <q-separator color="black" inset></q-separator>
+        <q-item clickable v-ripple @click="doLogOut">
+          <q-item-section> Log Out </q-item-section>
+        </q-item>
+      </q-list>
+    </q-btn-dropdown>
+  </div>
+  <div v-else class="text-font">
+    <q-btn
+        flat
+        color="primary"
+        no-caps
+        label="Login"
+        @click="goToLogin"
+    />
+  </div>
+</template>
 
+<style scoped>
+.user-dropdown {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.q-btn-dropdown__menu {
+  overflow-x: hidden;
+}
 </style>

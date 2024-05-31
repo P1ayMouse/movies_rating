@@ -6,11 +6,12 @@ from apps.movies.models import Movie, Person, PersonMovie, Rating
 class MovieSerializer(serializers.ModelSerializer):
     directors = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
+    num_votes = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
         fields = ['id', 'imdb_id', 'title_type', 'name', 'is_adult', 'year', 'genres', 'directors', 'average_rating',
-                  'poster']
+                  'num_votes', 'poster']
 
     def get_directors(self, obj):
         return obj.personmovie_set.filter(category__iexact='director').values_list("person_id__name", flat=True)
@@ -20,6 +21,12 @@ class MovieSerializer(serializers.ModelSerializer):
             return obj.rating_set.values_list("average_rating", flat=True).get()
         except Rating.DoesNotExist:
             return 0.0
+
+    def get_num_votes(self, obj):
+        try:
+            return obj.rating_set.values_list("num_votes", flat=True).get()
+        except Rating.DoesNotExist:
+            return 0
 
 
 class PersonSerializer(serializers.ModelSerializer):

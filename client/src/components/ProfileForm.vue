@@ -1,4 +1,6 @@
 <script>
+import {useQuasar} from "quasar";
+
 export default {
   name: "ProfileForm",
 
@@ -9,6 +11,10 @@ export default {
       userLoaded: false,
       formError: null,
     }
+  },
+  setup() {
+    const $q = useQuasar();
+    return { $q };
   },
   async mounted() {
     const token = localStorage.getItem('movies_rating-access')
@@ -54,42 +60,67 @@ export default {
 
 <template>
   <div class="text-font">
-    <div v-if="formError" class="alert alert-danger" role="alert">
-      {{ formError }}
-    </div>
-    <div class="d-flex justify-content-center m-5">
-      <form @submit.prevent="onUserEditProfile" class="col-12 col-md-6">
-        <br>
-        <div class="mb-4">
-          <label class="form-label">e-mail:</label>
-          <input type="email" name="email" class="form-control" v-model="user.email" readonly placeholder="Input your email">
-        </div>
-        <div class="mb-4">
-          <label class="form-label">username:</label>
-          <input name="username" class="form-control" v-model="user.username" placeholder="Input your username">
-        </div>
-        <div class="mb-4">
-          <label class="form-label">password:</label>
-          <input type="password" name="password" class="form-control" v-model="user.password" placeholder="Input your password">
-        </div>
-        <div class="mb-4">
-          <label class="form-label">repeat password:</label>
-          <input type="password" name="password2" class="form-control" v-model="user.password2" placeholder="Repeat your password">
-        </div>
-        <div class="d-flex justify-content-center">
-          <input type="submit" class="btn btn-outline-secondary m-4" value="Update">
-        </div>
-      </form>
+<!--    <div v-if="formError" class="alert alert-danger" role="alert">-->
+<!--      {{ formError }}-->
+<!--    </div>-->
+    <div class="d-flex justify-content-center align-items-center">
+      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%;">
+        <q-card-section class="text-h5 text-center q-mb-md">
+          Profile
+        </q-card-section>
+        <q-form @submit.prevent="onUserEditProfile" class="q-gutter-md">
+          <q-input
+              outlined
+              v-model="user.email"
+              placeholder="Input your email"
+              type="email"
+              label="e-mail"
+              readonly
+              color="grey"
+              class="q-mb-md"
+          />
+          <q-input
+              outlined
+              v-model="user.username"
+              placeholder="Input your username"
+              label="username"
+              color="grey"
+              class="q-mb-md"
+          />
+          <q-input
+              outlined
+              v-model="user.password"
+              placeholder="Input your password"
+              type="password"
+              label="password"
+              color="grey"
+              class="q-mb-md"
+          />
+          <q-input
+              outlined
+              v-model="user.password2"
+              placeholder="Repeat your password"
+              type="password"
+              label="repeat password"
+              color="grey"
+              class="q-mb-md"
+          />
+          <div class="text-center">
+            <q-btn label="Update" outline type="submit" color="grey" class="form-button q-mb-md"></q-btn>
+          </div>
+        </q-form>
+      </q-card>
     </div>
   </div>
 </template>
 
 <style scoped>
-  .col-12.col-md-6 {
-    width: 400px;
-  }
-  .text-font {
-    text-decoration: none;
-    font-family: Comic Sans MS, sans-serif;
-  }
+.text-font {
+  text-decoration: none;
+  font-family: 'Comic Sans MS', sans-serif;
+}
+
+.form-button {
+  border-radius: 5px;
+}
 </style>

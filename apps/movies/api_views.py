@@ -14,7 +14,7 @@ class MovieListCreateView(ListCreateAPIView):
     serializer_class = MovieSerializer
     filter_backends = [OrderingFilter, SearchFilter]
     search_fields = ['^name', '=imdb_id']
-    ordering_fields = ['rating__average_rating', 'id']
+    ordering_fields = ['rating__average_rating', 'rating__num_votes', 'id']
 
     def get_queryset(self):
         queryset = Movie.objects.all()
