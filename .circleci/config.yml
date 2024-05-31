@@ -16,20 +16,20 @@ jobs:
             - /usr/local/lib/python3.9/site-packages
 #      - run: prospector apps -X
 
-tests:
-  docker:
-    - image: playmouse/movies_rating-deploy
-  steps:
-    - checkout
-    - restore_cache:
-        key: python-dev-requirements
-    - run: pip install -r requirements-dev.txt
-    - save_cache:
-        key: python-dev-requirements-3.9
-        paths:
-          - /usr/local/lib/python3.9/site-packages
-    - run: coverage run manage.py test
-    - run: coverage report --fail-under=80
+  tests:
+    docker:
+      - image: playmouse/movies_rating-deploy
+    steps:
+      - checkout
+      - restore_cache:
+          key: python-dev-requirements
+      - run: pip install -r requirements-dev.txt
+      - save_cache:
+          key: python-dev-requirements-3.9
+          paths:
+            - /usr/local/lib/python3.9/site-packages
+      - run: coverage run manage.py test
+      - run: coverage report --fail-under=80
 
   deploy_dev:
     docker:
