@@ -1,3 +1,5 @@
+from urllib.parse import unquote
+
 from apps.movies.models import Movie, Person, PersonMovie, Rating
 from apps.movies.serializers import MovieSerializer, PersonSerializer, PersonMovieSerializer, RatingsSerializer
 
@@ -13,7 +15,7 @@ class MovieListCreateView(ListCreateAPIView):
     ]
     serializer_class = MovieSerializer
     filter_backends = [OrderingFilter, SearchFilter]
-    search_fields = ['^name', '=imdb_id']
+    search_fields = ['name', '=imdb_id']
     ordering_fields = ['rating__average_rating', 'rating__num_votes', 'id']
 
     def get_queryset(self):
@@ -28,6 +30,10 @@ class MovieListCreateView(ListCreateAPIView):
         if order_by := self.request.query_params.get('order_by'):
             queryset = queryset.order_by(order_by)
 
+        name = self.request.query_params.get('name')
+        if name:
+            name = unquote(name)
+            queryset = queryset.filter(name__icontains=name)
         return queryset
 
 
@@ -45,6 +51,7 @@ class PersonListCreateView(ListCreateAPIView):
     ]
     serializer_class = PersonSerializer
     search_fields = ['^name', '=imdb_id']
+
     def get_queryset(self):
         queryset = Person.objects.all()
 
