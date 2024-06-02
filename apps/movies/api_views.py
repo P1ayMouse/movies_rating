@@ -34,6 +34,11 @@ class MovieListCreateView(ListCreateAPIView):
         if name:
             name = unquote(name)
             queryset = queryset.filter(name__icontains=name)
+
+        imdb_id = self.request.query_params.get('imdb_id')
+        if imdb_id:
+            queryset = queryset.filter(imdb_id=imdb_id)
+
         return queryset
 
 
@@ -50,7 +55,7 @@ class PersonListCreateView(ListCreateAPIView):
         permissions.AllowAny
     ]
     serializer_class = PersonSerializer
-    search_fields = ['^name', '=imdb_id']
+    search_fields = ['name', '=imdb_id']
 
     def get_queryset(self):
         queryset = Person.objects.all()
@@ -58,10 +63,19 @@ class PersonListCreateView(ListCreateAPIView):
         if order_by := self.request.query_params.get('order_by'):
             queryset = queryset.order_by(order_by)
 
+        name = self.request.query_params.get('name')
+        if name:
+            name = unquote(name)
+            queryset = queryset.filter(name__icontains=name)
+
+        imdb_id = self.request.query_params.get('imdb_id')
+        if imdb_id:
+            queryset = queryset.filter(imdb_id=imdb_id)
+
         return queryset
 
 
-class PersonsRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+class PersonRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     permission_classes = [
         permissions.AllowAny
     ]
@@ -76,12 +90,15 @@ class PersonMovieListCreateView(ListCreateAPIView):
     serializer_class = PersonMovieSerializer
     search_fields = ['=movie_id__id', ]
 
-
     def get_queryset(self):
         queryset = PersonMovie.objects.all()
 
         if order_by := self.request.query_params.get('order_by'):
             queryset = queryset.order_by(order_by)
+
+        movie_id__id = self.request.query_params.get('movie_id__id')
+        if movie_id__id:
+            queryset = queryset.filter(movie_id__id=movie_id__id)
 
         return queryset
 

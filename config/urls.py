@@ -24,7 +24,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
 
     path('api/v1/auth/', include('apps.authentication.api_urls')),
-    path('api/v1/movies/', include('apps.movies.api_urls')),
+    path('api/v1/movies/', include('apps.movies.api_urls', namespace='movies')),
 
     re_path(r'^api/v1/swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^api/v1/swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
