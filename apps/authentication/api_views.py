@@ -1,13 +1,14 @@
-from apps.authentication.serializer import UserSerializer, RegistrationUserSerializer
+from apps.authentication.serializer import RegistrationUserSerializer, UpdateUserSerializer
 from django.contrib.auth import get_user_model
 from rest_framework import permissions
-from rest_framework.generics import RetrieveAPIView, CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 
 User = get_user_model()
 
 
-class CurrentUserDetailsView(RetrieveAPIView):
-    serializer_class = UserSerializer
+class CurrentUserDetailsView(RetrieveUpdateAPIView):
+    serializer_class = UpdateUserSerializer
+    http_method_names = ['get', 'patch', 'head', 'options']
 
     def get_object(self):
         return self.request.user

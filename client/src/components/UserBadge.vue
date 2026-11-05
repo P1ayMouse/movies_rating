@@ -51,7 +51,7 @@ export default {
     >
       <template v-slot:label>
         <q-icon name="account_circle" size="md" class="q-mr-sm" />
-        {{ user.username }}
+        {{ user.username || user.email }}
       </template>
       <q-list style="min-width: 150px; overflow: hidden;">
         <q-item clickable v-ripple @click="doEditAccount">

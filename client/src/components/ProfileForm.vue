@@ -1,6 +1,16 @@
 <script>
 import {useQuasar} from "quasar";
-import {authFetch} from "@/auth";
+import {authFetch, authState} from "@/auth";
+
+// DRF errors look like {"detail": "..."} or {"username": ["..."]}
+async function errorMessage(response) {
+  try {
+    const data = await response.json();
+    return [data.detail ?? Object.values(data)].flat(2)[0] || `Server error ${response.status}`;
+  } catch {
+    return `Server error ${response.status}`;
+  }
+}
 
 export default {
   name: "ProfileForm",
@@ -11,41 +21,69 @@ export default {
       },
       userLoaded: false,
       formError: null,
-    }
+    };
   },
   setup() {
     const $q = useQuasar();
     return { $q };
   },
   async mounted() {
-    let response
+    let response;
     try {
-      response = await authFetch('/api/v1/auth/user-info/')
+      response = await authFetch('/api/v1/auth/user-info/');
     } catch {
-      this.showError('Network error')
-      return
+      this.showError('Network error');
+      return;
     }
 
     if (response.status === 200) {
-      this.user = await response.json()
-      document.title = 'Profile of ' + this.user.username;
-      this.userLoaded = true
+      this.user = await response.json();
+      document.title = 'Profile of ' + (this.user.username || this.user.email);
+      this.userLoaded = true;
     }
     else if (response.status === 403) {
       // the session could not be renewed, so log in again
-      this.$router.push('/login')
+      this.$router.push('/login');
     }
     else {
-      this.showError(`Server error ${response.status}`)
+      this.showError(`Server error ${response.status}`);
     }
   },
   methods: {
-    async onUserEditProfile(e) {
-      e.preventDefault();
+    async onUserEditProfile() {
       this.formError = null;
+      const body = { username: this.user.username };
+      if (this.user.password || this.user.password2) {
+        body.password = this.user.password;
+        body.password2 = this.user.password2;
+      }
+
+      let response;
+      try {
+        response = await authFetch('/api/v1/auth/user-info/', {
+          method: 'PATCH',
+          body: JSON.stringify(body),
+        });
+      } catch {
+        this.showError('Network error');
+        return;
+      }
+
+      if (response.status === 200) {
+        this.user = await response.json();
+        authState.user = { ...this.user };
+        document.title = 'Profile of ' + (this.user.username || this.user.email);
+        this.$q.notify({ message: 'Profile updated', color: 'positive', position: 'top', timeout: 2000 });
+      }
+      else if (response.status === 403) {
+        this.$router.push('/login');
+      }
+      else {
+        this.showError(await errorMessage(response));
+      }
     },
     showError(message) {
-      this.formError = message
+      this.formError = message;
       this.$q.notify({
         message,
         color: 'negative',
@@ -53,10 +91,10 @@ export default {
         textColor: 'white',
         actions: [{ icon: 'close', color: 'white' }],
         timeout: 2000,
-      })
+      });
     },
   }
-}
+};
 </script>
 
 <template>

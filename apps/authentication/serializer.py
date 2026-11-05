@@ -41,32 +41,33 @@ class RegistrationUserSerializer(serializers.ModelSerializer):
         return user
 
 
-# class UpdateUserSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(write_only=True)
-#     password2 = serializers.CharField(write_only=True)
-#
-#     class Meta:
-#         model = User
-#         fields = ['email', 'password', 'password2', 'username']
-#         read_only_fields = ['email', ]
-#
-#     def update(self, instance, validated_data):
-#         password = validated_data.get('password')
-#         password2 = validated_data.get('password2')
-#         email = validated_data.get('email')
-#         username = validated_data.get('username')
-#
-#         if password != password2:
-#             raise serializers.ValidationError({'detail': 'Password mismatch'})
-#         elif len(password) < 6:
-#             raise serializers.ValidationError({'detail': 'Password is too small'})
-#         elif email != instance.email:
-#             raise serializers.ValidationError({'detail': 'Email mismatch'})
-#         elif username != instance.username:
-#             raise serializers.ValidationError({'detail': 'Username mismatch'})
-#         else:
-#             instance.email = email
-#             instance.username = username
-#             instance.set_password(password)
-#             instance.save()
-#             return instance
+class UpdateUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    password2 = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'password', 'password2']
+        read_only_fields = ['email']
+
+    def validate_username(self, value):
+        if len(value) < 6:
+            raise serializers.ValidationError('Username is too small')
+        return value
+
+    def validate(self, attrs):
+        password = attrs.get('password', '')
+
+        if password or attrs.get('password2'):
+            if password != attrs.get('password2'):
+                raise serializers.ValidationError({'detail': 'Password mismatch'})
+            if len(password) < 6:
+                raise serializers.ValidationError({'detail': 'Password is too small'})
+        return attrs
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', '')
+        validated_data.pop('password2', None)
+        if password:
+            instance.set_password(password)
+        return super().update(instance, validated_data)
