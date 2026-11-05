@@ -1,14 +1,12 @@
 <script>
 import {
-  QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip,
-  QToolbar, QToolbarTitle, QInput, QBtn, QSpace, QPage, QPageContainer, QLayout
+  QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip
 } from 'quasar'
 
 export default {
   name: 'MoviesListForm',
   components: {
-    QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip,
-    QToolbar, QToolbarTitle, QInput, QBtn, QSpace, QPage, QPageContainer, QLayout
+    QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip
   },
   data() {
     return {
@@ -84,7 +82,7 @@ export default {
         />
       </div>
       <div class="movies-grid">
-        <div v-for="(movie, index) in movies" :key="movie.id" class="movie-card-container">
+        <div v-for="movie in movies" :key="movie.id" class="movie-card-container">
           <q-card class="movie-card">
             <router-link :to="{ name: 'movie', params: { id: movie.id } }" class="movie-link">
               <q-img :src="(movie.poster && movie.poster !== 'None') ? movie.poster : '/src/components/icons/none_image.png'" class="card-img-top">

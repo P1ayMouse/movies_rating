@@ -23,7 +23,7 @@ class Command(BaseCommand):
                     continue
 
                 year = row[5]
-                if year == '\\N' or not (2020 <= int(year) <= 2023):
+                if year == '\\N' or not (2023 <= int(year) <= 2026):
                     continue
 
                 row_data = {

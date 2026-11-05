@@ -1,5 +1,6 @@
 <script>
 import { useQuasar } from 'quasar';
+import { loadCurrentUser, saveTokens } from '@/auth';
 
 export default {
   name: 'LoginForm',
@@ -34,9 +35,8 @@ export default {
         }
         this.errorNotify();
       } else {
-        const response_data = await response.json();
-        localStorage.setItem('movies_rating-access', response_data.access);
-        localStorage.setItem('movies_rating-refresh', response_data.refresh);
+        saveTokens(await response.json());
+        await loadCurrentUser();
         this.$router.push('/profile');
 
       }

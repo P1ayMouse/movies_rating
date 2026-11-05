@@ -1,6 +1,5 @@
 <script>
 import router from '../router'
-import StarRating from 'vue-star-rating'
 import {
   QCard,
   QCardSection,
@@ -8,30 +7,19 @@ import {
   QBtn,
   QTable,
   QTd,
-  QChip,
-  QSpinnerDots,
-  QToolbar,
-  QToolbarTitle,
-  QSpace,
-  QIcon
+  QSpinnerDots
 } from 'quasar'
 
 export default {
   name: 'MovieForm',
   components: {
-    StarRating,
     QCard,
     QCardSection,
     QImg,
     QBtn,
     QTable,
     QTd,
-    QChip,
-    QSpinnerDots,
-    QToolbar,
-    QToolbarTitle,
-    QSpace,
-    QIcon
+    QSpinnerDots
   },
   data() {
     return {
@@ -39,7 +27,7 @@ export default {
       formError: false,
       fullMovie: {},
       movie: {},
-      persons: [],
+      people: [],
       rating: {},
       isRatingCardOpen: false,
       isTopThreeVisible: false,
@@ -79,7 +67,7 @@ export default {
         fetch(urlTopThree).then(response => response.json())
             .then(topThreeData => {
               this.movie = data[0]
-              this.persons = data[1].results
+              this.people = data[1].results
               this.rating = data[2]
               this.topThree = topThreeData.results
 
@@ -166,9 +154,9 @@ export default {
         </q-card-section>
       </q-card>
 
-      <q-card flat class="q-ma-md" v-if="persons.length !== 0">
+      <q-card flat class="q-ma-md" v-if="people.length !== 0">
         <q-card-section>
-          <q-table :rows="persons" :columns="columns" row-key="name" flat bordered hide-pagination>
+          <q-table :rows="people" :columns="columns" row-key="name" flat bordered hide-pagination>
             <template v-slot:body-cell-name="props">
               <q-td :props="props" data-label="Name">
                 <q-btn flat @click="onPersonPush(props.row)" class="q-ml-sm" style="text-transform: none;">{{ props.row.person_id.name }}</q-btn>

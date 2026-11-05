@@ -1,5 +1,6 @@
 <script>
 import {useQuasar} from "quasar";
+import {authFetch} from "@/auth";
 
 export default {
   name: "ProfileForm",
@@ -17,42 +18,42 @@ export default {
     return { $q };
   },
   async mounted() {
-    const token = localStorage.getItem('movies_rating-access')
-    let user = null
-
-    const response = await fetch('/api/v1/auth/user-info/', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
+    let response
+    try {
+      response = await authFetch('/api/v1/auth/user-info/')
+    } catch {
+      this.showError('Network error')
+      return
+    }
 
     if (response.status === 200) {
-      user = await response.json()
-      document.title = 'Profile of ' + user.username;
+      this.user = await response.json()
+      document.title = 'Profile of ' + this.user.username;
+      this.userLoaded = true
     }
     else if (response.status === 403) {
-      // try to renew token
-      const newTokenResponse = await fetch('/api/v1/auth/refresh/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({'refresh': localStorage.getItem('movies_rating-refresh')})
-          }
-      )
+      // the session could not be renewed, so log in again
+      this.$router.push('/login')
     }
     else {
-      user = {email: 'Error'}
+      this.showError(`Server error ${response.status}`)
     }
-
-    this.user = user
-    this.userLoaded = true
   },
   methods: {
     async onUserEditProfile(e) {
       e.preventDefault();
       this.formError = null;
+    },
+    showError(message) {
+      this.formError = message
+      this.$q.notify({
+        message,
+        color: 'negative',
+        position: 'top',
+        textColor: 'white',
+        actions: [{ icon: 'close', color: 'white' }],
+        timeout: 2000,
+      })
     },
   }
 }

@@ -29,7 +29,7 @@ class Command(BaseCommand):
                     movie_id = row[0]
                     person_id = row[2]
 
-                    if movie_id not in movies_ids and person_id not in people_ids:
+                    if movie_id not in movies_ids or person_id not in people_ids:
                         continue
 
                     movie = Movie.objects.get(imdb_id=movie_id)

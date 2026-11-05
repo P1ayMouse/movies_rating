@@ -4,6 +4,13 @@ from apps.movies.models import Person, Movie
 from django.db import transaction
 
 
+def year_to_date(value):
+    # IMDb has years like "496"; Django needs 4 digits ("0496-01-01")
+    if not value.isdigit() or int(value) == 0:
+        return None
+    return f'{int(value):04d}-01-01'
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-f', '--file', type=str)
@@ -35,8 +42,8 @@ class Command(BaseCommand):
                     row_data = {
                         'imdb_id': row[0],
                         'name': row[1],
-                        'birth_year': f'{row[2]}-01-01' if row[2] != '\\N' else None,
-                        'death_year': f'{row[3]}-01-01' if row[3] != '\\N' else None,
+                        'birth_year': year_to_date(row[2]),
+                        'death_year': year_to_date(row[3]),
                         'known_for_titles': movies_imdb_id,
                     }
 

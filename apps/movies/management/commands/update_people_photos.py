@@ -1,21 +1,20 @@
 import requests
 from django.core.management import BaseCommand
+
+from apps.movies.tmdb import get_tmdb_token
 from apps.movies.models import Person
 
 
 class Command(BaseCommand):
     def handle(self, **options):
-        persons = Person.objects.filter(photo__isnull=True)
+        people = Person.objects.filter(photo__isnull=True)
 
         headers = {
             "accept": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9"
-                             ".eyJhdWQiOiIwMTQyYzI5ODNkYjQyOWY5NTlmZTQ0YmJhYjE4YTBmMSIsInN1YiI6IjY2NDFlMTI3YjNmZDI4"
-                             "Y2UyMmMxODc0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZIef65Pk9eQ-6scSia3LBK"
-                             "fdDtGw8rfwYjJHSRi4pUg"
+            "Authorization": f"Bearer {get_tmdb_token()}"
         }
 
-        for person in persons:
+        for person in people:
             api_url = f"https://api.themoviedb.org/3/find/{person.imdb_id}?external_source=imdb_id"
             try:
                 response = requests.get(api_url, headers=headers)

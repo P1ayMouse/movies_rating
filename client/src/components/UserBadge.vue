@@ -1,63 +1,25 @@
 <script>
+import { authState, clearTokens, loadCurrentUser } from '@/auth'
+
 export default {
   name: "UserBadge",
-  data() {
-    return {
-      user: null,
-      userLoaded: false
+  computed: {
+    user() {
+      return authState.user
+    },
+    userLoaded() {
+      return authState.loaded
+    },
+    loadError() {
+      return authState.error
     }
   },
-  async mounted() {
-    const token = localStorage.getItem('movies_rating-access')
-    let user = null
-
-    const response = await fetch('/api/v1/auth/user-info/', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (response.status === 200) {
-      user = await response.json()
-    }
-    else if (response.status === 403) {
-      const newTokenResponse = await fetch('/api/v1/auth/refresh/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({'refresh': localStorage.getItem('movies_rating-refresh')})
-          }
-      )
-      if (newTokenResponse.status === 200 ) {
-        localStorage.setItem('movies_rating-access', (await newTokenResponse.json()).access)
-        const retryResponse = await fetch('/api/v1/auth/user-info/', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('movies_rating-access')}`,
-            'Content-Type': 'application/json'
-          }
-        })
-
-        if (retryResponse.status === 200) {
-          user = await retryResponse.json()
-        }
-      } else {
-        localStorage.removeItem('movies_rating-access')
-        localStorage.removeItem('movies_rating-refresh')
-      }
-    } else {
-      user = { email: 'Error' }
-    }
-
-    this.user = user
-    this.userLoaded = true
+  mounted() {
+    loadCurrentUser()
   },
   methods: {
     doLogOut() {
-      localStorage.removeItem('movies_rating-access')
-      localStorage.removeItem('movies_rating-refresh')
-      this.user = null
+      clearTokens()
       this.$router.push('/login')
     },
     doEditAccount() {
@@ -68,6 +30,9 @@ export default {
     },
     goToLogin() {
       this.$router.push('/login')
+    },
+    retryLoad() {
+      loadCurrentUser()
     }
   }
 }
@@ -101,6 +66,18 @@ export default {
         </q-item>
       </q-list>
     </q-btn-dropdown>
+  </div>
+  <div v-else-if="loadError" class="text-font">
+    <q-btn
+        flat
+        color="negative"
+        no-caps
+        icon="error_outline"
+        label="Retry"
+        @click="retryLoad"
+    >
+      <q-tooltip>{{ loadError }}</q-tooltip>
+    </q-btn>
   </div>
   <div v-else class="text-font">
     <q-btn
