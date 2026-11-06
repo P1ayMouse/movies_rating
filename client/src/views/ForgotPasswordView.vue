@@ -1,5 +1,5 @@
 <script setup>
-import ForgotPasswordForm from "../components/ForgotPasswordForm.vue";
+import ForgotPasswordForm from '../components/ForgotPasswordForm.vue';
 document.title = 'Forgot password';
 </script>
 
@@ -8,4 +8,3 @@ document.title = 'Forgot password';
     <ForgotPasswordForm />
   </main>
 </template>
-

@@ -1,5 +1,5 @@
 <script setup>
-import PersonForm from "../components/PersonForm.vue";
+import PersonForm from '../components/PersonForm.vue';
 </script>
 
 <template>

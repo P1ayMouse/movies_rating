@@ -1,14 +1,14 @@
 <script>
-import {useQuasar} from "quasar";
+import { useQuasar } from 'quasar';
 
 export default {
-  name: "ForgotPasswordForm",
+  name: 'ForgotPasswordForm',
 
   data() {
     return {
       user: {},
       formError: null
-    }
+    };
   },
   setup() {
     const $q = useQuasar();
@@ -27,7 +27,7 @@ export default {
         textColor: 'white',
         actions: [{ icon: 'close', color: 'white' }],
         html: true,
-        timeout: 2000,
+        timeout: 2000
       });
     },
     errorNotify() {
@@ -38,7 +38,7 @@ export default {
         textColor: 'white',
         actions: [{ icon: 'close', color: 'white' }],
         html: true,
-        timeout: 2000,
+        timeout: 2000
       });
     },
     goToLogin() {
@@ -46,48 +46,51 @@ export default {
     },
     goToRegister() {
       this.$router.push('/register/');
-    },
+    }
   }
-}
-
+};
 </script>
 <template>
   <div class="text-font">
     <div class="d-flex justify-content-center align-items-center">
-      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%;">
-        <q-card-section class="text-h5 text-center q-mb-md">
-          Forgot Password
-        </q-card-section>
+      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
+        <q-card-section class="text-h5 text-center q-mb-md"> Forgot Password </q-card-section>
         <q-form @submit="onUserForgotPassword" class="q-gutter-md">
           <q-input
-              outlined
-              v-model="user.email"
-              placeholder="Input your email"
-              type="email"
-              label="e-mail"
-              required
-              color="grey"
-              class="q-mb-md"
+            outlined
+            v-model="user.email"
+            placeholder="Input your email"
+            type="email"
+            label="e-mail"
+            required
+            color="grey"
+            class="q-mb-md"
           />
           <div class="text-center">
-            <q-btn label="Send password reset" outline type="submit" color="grey" class="form-button q-mb-md"></q-btn>
+            <q-btn
+              label="Send password reset"
+              outline
+              type="submit"
+              color="grey"
+              class="form-button q-mb-md"
+            ></q-btn>
           </div>
           <div class="d-flex justify-content-between">
             <q-btn
-                flat
-                color="primary"
-                no-caps
-                label="Login"
-                class="float-start"
-                @click="goToLogin"
+              flat
+              color="primary"
+              no-caps
+              label="Login"
+              class="float-start"
+              @click="goToLogin"
             />
             <q-btn
-                flat
-                color="primary"
-                no-caps
-                label="Register"
-                class="float-end"
-                @click="goToRegister"
+              flat
+              color="primary"
+              no-caps
+              label="Register"
+              class="float-end"
+              @click="goToRegister"
             />
           </div>
         </q-form>

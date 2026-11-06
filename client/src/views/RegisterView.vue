@@ -1,5 +1,5 @@
 <script setup>
-import RegisterForm from "../components/RegisterForm.vue";
+import RegisterForm from '../components/RegisterForm.vue';
 document.title = 'Register';
 </script>
 
@@ -8,4 +8,3 @@ document.title = 'Register';
     <RegisterForm />
   </main>
 </template>
-

@@ -1,41 +1,41 @@
 <script>
-import { authState, clearTokens, loadCurrentUser } from '@/auth'
+import { authState, clearTokens, loadCurrentUser } from '@/auth';
 
 export default {
-  name: "UserBadge",
+  name: 'UserBadge',
   computed: {
     user() {
-      return authState.user
+      return authState.user;
     },
     userLoaded() {
-      return authState.loaded
+      return authState.loaded;
     },
     loadError() {
-      return authState.error
+      return authState.error;
     }
   },
   mounted() {
-    loadCurrentUser()
+    loadCurrentUser();
   },
   methods: {
     doLogOut() {
-      clearTokens()
-      this.$router.push('/login')
+      clearTokens();
+      this.$router.push('/login');
     },
     doEditAccount() {
-      this.$router.push('/profile')
+      this.$router.push('/profile');
     },
     doMoviesList() {
-      this.$router.push('/movies')
+      this.$router.push('/movies');
     },
     goToLogin() {
-      this.$router.push('/login')
+      this.$router.push('/login');
     },
     retryLoad() {
-      loadCurrentUser()
+      loadCurrentUser();
     }
   }
-}
+};
 </script>
 
 <template>
@@ -43,17 +43,12 @@ export default {
     <q-spinner-dots color="black" size="64px" />
   </div>
   <div v-else-if="user !== null">
-    <q-btn-dropdown
-        flat
-        color="black"
-        no-caps
-        class="user-dropdown"
-    >
+    <q-btn-dropdown flat color="black" no-caps class="user-dropdown">
       <template v-slot:label>
         <q-icon name="account_circle" size="md" class="q-mr-sm" />
         {{ user.username || user.email }}
       </template>
-      <q-list style="min-width: 150px; overflow: hidden;">
+      <q-list style="min-width: 150px; overflow: hidden">
         <q-item clickable v-ripple @click="doEditAccount">
           <q-item-section> Edit Account </q-item-section>
         </q-item>
@@ -68,25 +63,12 @@ export default {
     </q-btn-dropdown>
   </div>
   <div v-else-if="loadError" class="text-font">
-    <q-btn
-        flat
-        color="negative"
-        no-caps
-        icon="error_outline"
-        label="Retry"
-        @click="retryLoad"
-    >
+    <q-btn flat color="negative" no-caps icon="error_outline" label="Retry" @click="retryLoad">
       <q-tooltip>{{ loadError }}</q-tooltip>
     </q-btn>
   </div>
   <div v-else class="text-font">
-    <q-btn
-        flat
-        color="primary"
-        no-caps
-        label="Login"
-        @click="goToLogin"
-    />
+    <q-btn flat color="primary" no-caps label="Login" @click="goToLogin" />
   </div>
 </template>
 

@@ -1,19 +1,19 @@
-import { reactive } from 'vue'
+import { reactive } from 'vue';
 
-const ACCESS_KEY = 'movies_rating-access'
-const REFRESH_KEY = 'movies_rating-refresh'
+const ACCESS_KEY = 'movies_rating-access';
+const REFRESH_KEY = 'movies_rating-refresh';
 
-export const authState = reactive({ user: null, loaded: false, error: null })
+export const authState = reactive({ user: null, loaded: false, error: null });
 
 export function saveTokens({ access, refresh }) {
-  localStorage.setItem(ACCESS_KEY, access)
-  localStorage.setItem(REFRESH_KEY, refresh)
+  localStorage.setItem(ACCESS_KEY, access);
+  localStorage.setItem(REFRESH_KEY, refresh);
 }
 
 export function clearTokens() {
-  localStorage.removeItem(ACCESS_KEY)
-  localStorage.removeItem(REFRESH_KEY)
-  authState.user = null
+  localStorage.removeItem(ACCESS_KEY);
+  localStorage.removeItem(REFRESH_KEY);
+  authState.user = null;
 }
 
 function request(url, options) {
@@ -22,50 +22,50 @@ function request(url, options) {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
-      'Authorization': `Bearer ${localStorage.getItem(ACCESS_KEY)}`,
-    },
-  })
+      Authorization: `Bearer ${localStorage.getItem(ACCESS_KEY)}`
+    }
+  });
 }
 
 async function refreshAccessToken() {
   const response = await fetch('/api/v1/auth/refresh/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh: localStorage.getItem(REFRESH_KEY) }),
-  })
+    body: JSON.stringify({ refresh: localStorage.getItem(REFRESH_KEY) })
+  });
   if (response.status !== 200) {
-    return false
+    return false;
   }
-  localStorage.setItem(ACCESS_KEY, (await response.json()).access)
-  return true
+  localStorage.setItem(ACCESS_KEY, (await response.json()).access);
+  return true;
 }
 
 export async function authFetch(url, options = {}) {
-  const response = await request(url, options)
+  const response = await request(url, options);
   if (response.status !== 403) {
-    return response
+    return response;
   }
   if (!(await refreshAccessToken())) {
-    clearTokens()
-    return response
+    clearTokens();
+    return response;
   }
-  return request(url, options)
+  return request(url, options);
 }
 
 export async function loadCurrentUser() {
-  authState.error = null
+  authState.error = null;
   try {
-    const response = await authFetch('/api/v1/auth/user-info/')
+    const response = await authFetch('/api/v1/auth/user-info/');
     if (response.status === 200) {
-      authState.user = await response.json()
+      authState.user = await response.json();
     } else if (response.status === 403) {
-      authState.user = null
+      authState.user = null;
     } else {
-      authState.error = `Server error ${response.status}`
+      authState.error = `Server error ${response.status}`;
     }
   } catch {
-    authState.error = 'Network error'
+    authState.error = 'Network error';
   }
-  authState.loaded = true
-  return authState.user
+  authState.loaded = true;
+  return authState.user;
 }

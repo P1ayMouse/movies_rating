@@ -1,17 +1,17 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import UserBadge from './components/UserBadge.vue'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import UserBadge from './components/UserBadge.vue';
 
-const search = ref('')
-const router = useRouter()
+const search = ref('');
+const router = useRouter();
 
 const onMovieSearch = () => {
   if (search.value.trim()) {
-    router.push({ name: 'movies-search', params: { search: search.value.trim() } })
-    search.value = ''
+    router.push({ name: 'movies-search', params: { search: search.value.trim() } });
+    search.value = '';
   }
-}
+};
 </script>
 
 <template>
@@ -25,17 +25,13 @@ const onMovieSearch = () => {
         <div class="d-flex flex-grow-1 justify-content-center">
           <form class="d-flex align-items-center form-container">
             <input
-                v-model="search"
-                type="text"
-                placeholder="Search"
-                class="search-input"
-                @keyup.enter="onMovieSearch"
+              v-model="search"
+              type="text"
+              placeholder="Search"
+              class="search-input"
+              @keyup.enter="onMovieSearch"
             />
-            <button
-                type="submit"
-                class="search-button"
-                @click="onMovieSearch"
-            >
+            <button type="submit" class="search-button" @click="onMovieSearch">
               <q-icon name="search" />
             </button>
           </form>
@@ -49,12 +45,14 @@ const onMovieSearch = () => {
     </nav>
   </header>
 
-  <RouterView class="text-font"/>
+  <RouterView class="text-font" />
 </template>
 
 <style scoped>
 .text-font {
-  font-family: Comic Sans MS, sans-serif;
+  font-family:
+    Comic Sans MS,
+    sans-serif;
 }
 
 .search-input {

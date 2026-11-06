@@ -1,5 +1,5 @@
 <script setup>
-import MoviesListForm from "../components/MoviesListForm.vue";
+import MoviesListForm from '../components/MoviesListForm.vue';
 </script>
 
 <template>

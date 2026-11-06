@@ -1,8 +1,7 @@
+import 'quasar/dist/quasar.css';
+import '@quasar/extras/material-icons/material-icons.css';
 
-import 'quasar/dist/quasar.css'
-import '@quasar/extras/material-icons/material-icons.css'
-
-import { Notify } from 'quasar'
+import { Notify } from 'quasar';
 
 export default {
   plugins: {
@@ -11,4 +10,4 @@ export default {
   config: {
     notify: {} // Optional global config for Notify
   }
-}
+};

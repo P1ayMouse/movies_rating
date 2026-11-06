@@ -1,12 +1,16 @@
 <script>
-import {
-  QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip
-} from 'quasar'
+import { QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip } from 'quasar';
 
 export default {
   name: 'MoviesListForm',
   components: {
-    QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip
+    QPagination,
+    QSpinnerDots,
+    QCard,
+    QCardSection,
+    QImg,
+    QIcon,
+    QChip
   },
   data() {
     return {
@@ -17,44 +21,47 @@ export default {
       movies: [],
       search: '',
       directors: []
-    }
+    };
   },
   async mounted() {
-    await this.loadMovies()
-    document.title = 'Diploma MDB'
+    await this.loadMovies();
+    document.title = 'Diploma MDB';
   },
   watch: {
     page() {
-      this.loadMovies()
+      this.loadMovies();
     }
   },
   methods: {
     async loadMovies() {
-      this.moviesLoaded = false
+      this.moviesLoaded = false;
 
-      this.search = this.$route.params.search ? this.$route.params.search : ''
+      this.search = this.$route.params.search ? this.$route.params.search : '';
 
-      const response_movies = await fetch(`/api/v1/movies/?limit=${this.limit}&offset=${(this.page - 1) * this.limit}&search=${this.search}&ordering=-rating__num_votes`, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response_movies = await fetch(
+        `/api/v1/movies/?limit=${this.limit}&offset=${(this.page - 1) * this.limit}&search=${this.search}&ordering=-rating__num_votes`,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      })
+      );
 
       if (response_movies.status === 200) {
-        const response_movies_Data = await response_movies.json()
-        this.movies = response_movies_Data.results
-        this.count = response_movies_Data.count
+        const response_movies_Data = await response_movies.json();
+        this.movies = response_movies_Data.results;
+        this.count = response_movies_Data.count;
       }
 
-      this.moviesLoaded = true
+      this.moviesLoaded = true;
     }
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.count / this.limit)
+      return Math.ceil(this.count / this.limit);
     }
   }
-}
+};
 </script>
 
 <template>
@@ -67,25 +74,32 @@ export default {
     <div v-else class="movie-container">
       <div class="pagination-container" v-if="totalPages > 1">
         <q-pagination
-            v-model="page"
-            :max="totalPages"
-            :max-pages="1"
-            direction-links
-            boundary-links
-            :ellipses="false"
-            :boundary-numbers="false"
-            icon-first="skip_previous"
-            icon-last="skip_next"
-            icon-prev="fast_rewind"
-            icon-next="fast_forward"
-            class="pagination-mobile"
+          v-model="page"
+          :max="totalPages"
+          :max-pages="1"
+          direction-links
+          boundary-links
+          :ellipses="false"
+          :boundary-numbers="false"
+          icon-first="skip_previous"
+          icon-last="skip_next"
+          icon-prev="fast_rewind"
+          icon-next="fast_forward"
+          class="pagination-mobile"
         />
       </div>
       <div class="movies-grid">
         <div v-for="movie in movies" :key="movie.id" class="movie-card-container">
           <q-card class="movie-card">
             <router-link :to="{ name: 'movie', params: { id: movie.id } }" class="movie-link">
-              <q-img :src="(movie.poster && movie.poster !== 'None') ? movie.poster : '/src/components/icons/none_image.png'" class="card-img-top">
+              <q-img
+                :src="
+                  movie.poster && movie.poster !== 'None'
+                    ? movie.poster
+                    : '/src/components/icons/none_image.png'
+                "
+                class="card-img-top"
+              >
                 <template v-slot:error>
                   <q-icon name="image_off" size="5em" />
                 </template>
@@ -95,10 +109,14 @@ export default {
                 <div class="movie-details">
                   <span v-if="movie.year">{{ movie.year.substring(0, 4) }}</span>
                   <span v-if="movie.year && movie.directors.length !== 0">, </span>
-                  <span v-for="(director, index) in movie.directors" :key="index">{{ director }}{{ index === movie.directors.length - 1 ? '' : ', ' }}</span>
+                  <span v-for="(director, index) in movie.directors" :key="index"
+                    >{{ director }}{{ index === movie.directors.length - 1 ? '' : ', ' }}</span
+                  >
                 </div>
                 <div class="movie-genres">
-                  <q-chip v-for="(genre, index) in movie.genres" :key="index" outline>{{ genre }}</q-chip>
+                  <q-chip v-for="(genre, index) in movie.genres" :key="index" outline>{{
+                    genre
+                  }}</q-chip>
                 </div>
               </q-card-section>
             </router-link>
@@ -106,36 +124,36 @@ export default {
         </div>
       </div>
 
-      <br><br>
+      <br /><br />
 
       <div class="pagination-container" v-if="totalPages > 1">
         <q-pagination
-            v-model="page"
-            :max="totalPages"
-            :max-pages="6"
-            direction-links
-            boundary-links
-            :ellipses="false"
-            :boundary-numbers="false"
-            icon-first="skip_previous"
-            icon-last="skip_next"
-            icon-prev="fast_rewind"
-            icon-next="fast_forward"
-            class="pagination-desktop"
+          v-model="page"
+          :max="totalPages"
+          :max-pages="6"
+          direction-links
+          boundary-links
+          :ellipses="false"
+          :boundary-numbers="false"
+          icon-first="skip_previous"
+          icon-last="skip_next"
+          icon-prev="fast_rewind"
+          icon-next="fast_forward"
+          class="pagination-desktop"
         />
         <q-pagination
-            v-model="page"
-            :max="totalPages"
-            :max-pages="1"
-            direction-links
-            boundary-links
-            :ellipses="false"
-            :boundary-numbers="false"
-            icon-first="skip_previous"
-            icon-last="skip_next"
-            icon-prev="fast_rewind"
-            icon-next="fast_forward"
-            class="pagination-mobile"
+          v-model="page"
+          :max="totalPages"
+          :max-pages="1"
+          direction-links
+          boundary-links
+          :ellipses="false"
+          :boundary-numbers="false"
+          icon-first="skip_previous"
+          icon-last="skip_next"
+          icon-prev="fast_rewind"
+          icon-next="fast_forward"
+          class="pagination-mobile"
         />
       </div>
       <div v-else-if="count === 0 && moviesLoaded" class="no-movies">
@@ -148,7 +166,9 @@ export default {
 <style scoped>
 .text-font {
   text-decoration: none;
-  font-family: Comic Sans MS, sans-serif;
+  font-family:
+    Comic Sans MS,
+    sans-serif;
 }
 
 .spinner-container {
@@ -177,7 +197,9 @@ export default {
 .movie-card {
   width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
   border-radius: 10px;
   overflow: hidden;
 }
