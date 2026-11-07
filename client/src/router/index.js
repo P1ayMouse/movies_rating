@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import ForgotPasswordView from '../views/ForgotPasswordView.vue';
+import ResetPasswordView from '../views/ResetPasswordView.vue';
 import MoviesListView from '../views/MoviesListView.vue';
 import ProfileView from '../views/ProfileView.vue';
 import MovieView from '../views/MovieView.vue';
@@ -28,6 +29,12 @@ const router = createRouter({
       path: '/password-forgot/',
       name: 'password-forgot',
       component: ForgotPasswordView
+    },
+    {
+      path: '/password-reset/:token/',
+      name: 'password-reset',
+      component: ResetPasswordView,
+      props: true
     },
     {
       path: '/movies/:search',

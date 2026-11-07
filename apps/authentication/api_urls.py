@@ -5,7 +5,12 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from apps.authentication.api_views import CurrentUserDetailsView, UserRegistrationView
+from apps.authentication.api_views import (
+    CurrentUserDetailsView,
+    PasswordResetConfirmView,
+    PasswordResetRequestView,
+    UserRegistrationView,
+)
 
 app_name = 'authentication'
 
@@ -14,4 +19,6 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('user-info/', CurrentUserDetailsView.as_view(), name='current-user'),
     path('user-registration/', UserRegistrationView.as_view(), name='registration-user'),
+    path('password-reset/', PasswordResetRequestView.as_view(), name='password-reset'),
+    path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ]

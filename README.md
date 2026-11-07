@@ -66,13 +66,21 @@ The IMDb files take several gigabytes and the commands save rows one by one, so 
 
 ## Environment variables (`.env`)
 
-| Variable | Purpose |
-|----------|---------|
+| Variable | Purpose                                                                         |
+|----------|---------------------------------------------------------------------------------|
 | `DJANGO_SETTINGS_MODULE` | `settings.docker` for running locally in Docker, `settings.prod` for the server |
-| `DJANGO_SECRET_KEY` | Django secret key |
-| `PY_AUTORELOAD` | `True`: uwsgi restarts when the code changes |
-| `POSTGRES_DB`, `POSTGRES_PASSWORD` | Used by both the Postgres container and Django |
-| `TMDB_API_TOKEN` | TMDB token for posters and photos |
+| `DJANGO_SECRET_KEY` | Django secret key                                                               |
+| `PY_AUTORELOAD` | `True`: uwsgi restarts when the code changes                                    |
+| `POSTGRES_DB`, `POSTGRES_PASSWORD` | Used by both the Postgres container and Django                                  |
+| `TMDB_API_TOKEN` | TMDB token for posters and photos                                               |
+| `SITE_URL` | Base URL for links in emails (default `http://localhost:8000`)                  |
+| `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | SMTP server for emails. Leave `EMAIL_HOST` empty in development                 |
+
+### Password reset emails
+
+"Forgot password" sends a link that works once and expires in an hour. In development emails are not sent.
+
+To send real emails, fill in `EMAIL_HOST`, `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD` in `.env`.
 
 ## Development without Docker
 

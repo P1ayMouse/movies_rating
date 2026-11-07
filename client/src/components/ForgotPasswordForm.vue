@@ -1,5 +1,6 @@
 <script>
 import { useQuasar } from 'quasar';
+import { errorMessage } from '@/errors';
 
 export default {
   name: 'ForgotPasswordForm',
@@ -7,7 +8,8 @@ export default {
   data() {
     return {
       user: {},
-      formError: null
+      formError: null,
+      sending: false
     };
   },
   setup() {
@@ -18,16 +20,35 @@ export default {
     async onUserForgotPassword(e) {
       e.preventDefault();
       this.formError = null;
+      this.sending = true;
+      try {
+        const response = await fetch('/api/v1/auth/password-reset/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this.user.email })
+        });
+        if (response.status === 200) {
+          this.positiveNotify((await response.json()).detail);
+          this.user = {};
+        } else {
+          this.formError = await errorMessage(response);
+          this.errorNotify();
+        }
+      } catch {
+        this.formError = 'Network error';
+        this.errorNotify();
+      } finally {
+        this.sending = false;
+      }
     },
-    positiveNotify() {
+    positiveNotify(message) {
       this.$q.notify({
-        message: 'Password reset link sent!',
+        message,
         color: 'positive',
         position: 'top',
         textColor: 'white',
         actions: [{ icon: 'close', color: 'white' }],
-        html: true,
-        timeout: 2000
+        timeout: 5000
       });
     },
     errorNotify() {
@@ -37,7 +58,6 @@ export default {
         position: 'top',
         textColor: 'white',
         actions: [{ icon: 'close', color: 'white' }],
-        html: true,
         timeout: 2000
       });
     },
@@ -71,6 +91,7 @@ export default {
               label="Send password reset"
               outline
               type="submit"
+              :loading="sending"
               color="grey"
               class="form-button q-mb-md"
             ></q-btn>

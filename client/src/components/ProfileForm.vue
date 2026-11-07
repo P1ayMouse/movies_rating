@@ -1,16 +1,7 @@
 <script>
 import { useQuasar } from 'quasar';
 import { authFetch, authState } from '@/auth';
-
-// DRF errors look like {"detail": "..."} or {"username": ["..."]}
-async function errorMessage(response) {
-  try {
-    const data = await response.json();
-    return [data.detail ?? Object.values(data)].flat(2)[0] || `Server error ${response.status}`;
-  } catch {
-    return `Server error ${response.status}`;
-  }
-}
+import { errorMessage } from '@/errors';
 
 export default {
   name: 'ProfileForm',
