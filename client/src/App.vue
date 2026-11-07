@@ -16,14 +16,14 @@ const onMovieSearch = () => {
 
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg bg-light text-font">
-      <div class="container-fluid d-flex justify-content-between align-items-center">
+    <nav class="site-header text-font">
+      <div class="site-header-inner row justify-between items-center">
         <!-- Site name -->
         <a href="/movies/" class="site-name"> Diploma MDB </a>
 
         <!-- Centered search form -->
-        <div class="d-flex flex-grow-1 justify-content-center">
-          <form class="d-flex align-items-center form-container">
+        <div class="search-area row justify-center">
+          <form class="row no-wrap items-center form-container">
             <input
               v-model="search"
               type="text"
@@ -48,7 +48,30 @@ const onMovieSearch = () => {
   <RouterView class="text-font" />
 </template>
 
+<style>
+body {
+  color: #212529;
+  background-color: #fff;
+}
+</style>
+
 <style scoped>
+.site-header {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  background-color: #f8f9fa;
+}
+
+.site-header-inner {
+  width: 100%;
+  padding: 0 0.75rem;
+}
+
+.search-area {
+  flex-grow: 1;
+}
+
 .text-font {
   font-family:
     Comic Sans MS,
@@ -100,9 +123,8 @@ const onMovieSearch = () => {
     margin-top: 10px;
   }
 
-  .container-fluid {
+  .site-header-inner {
     flex-direction: column;
-    align-items: flex-start;
   }
 
   .form-container {

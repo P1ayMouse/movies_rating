@@ -64,7 +64,7 @@ export default {
 
 <template>
   <div class="text-font">
-    <div class="d-flex justify-content-center align-items-center">
+    <div class="row justify-center items-center">
       <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
         <q-card-section class="text-h5 text-center q-mb-md"> New Password </q-card-section>
         <q-form @submit.prevent="onResetPassword" class="q-gutter-md">

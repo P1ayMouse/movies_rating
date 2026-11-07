@@ -149,10 +149,7 @@ export default {
                 :ratio="0.67"
                 :img-class="'high-quality'"
               />
-              <div
-                class="d-flex align-items-center justify-content-center"
-                style="padding-top: 10px"
-              >
+              <div class="row items-center justify-center" style="padding-top: 10px">
                 <q-rating
                   v-model="movie.average_rating"
                   max="10"

@@ -98,7 +98,7 @@ export default {
                     ? movie.poster
                     : '/src/components/icons/none_image.png'
                 "
-                class="card-img-top"
+                class="movie-card-img"
               >
                 <template v-slot:error>
                   <q-icon name="image_off" size="5em" />
@@ -214,7 +214,7 @@ export default {
   color: inherit;
 }
 
-.card-img-top {
+.movie-card-img {
   height: 400px;
   object-fit: cover;
   border-bottom: 1px solid #eee;
@@ -246,8 +246,7 @@ export default {
 }
 
 .pagination-mobile {
-  display: block;
-  margin-right: 25%;
+  display: flex;
   margin-bottom: 20px;
 }
 
@@ -258,7 +257,7 @@ export default {
 
 @media (min-width: 577px) {
   .pagination-desktop {
-    display: block;
+    display: flex;
   }
 
   .pagination-mobile {

@@ -62,7 +62,7 @@ export default {
 
 <template>
   <div class="text-font">
-    <div class="d-flex justify-content-center align-items-center">
+    <div class="row justify-center items-center">
       <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
         <q-card-section class="text-h5 text-center q-mb-md"> Login </q-card-section>
         <q-form @submit="onUserLogin" class="q-gutter-md">
@@ -95,23 +95,15 @@ export default {
               class="form-button q-mb-md"
             ></q-btn>
           </div>
-          <div class="d-flex justify-content-between">
+          <div class="row justify-between">
             <q-btn
               flat
               color="primary"
               no-caps
               label="Forgot password"
-              class="float-start"
               @click="goToPasswordForgot"
             />
-            <q-btn
-              flat
-              color="primary"
-              no-caps
-              label="Register"
-              class="float-end"
-              @click="goToRegister"
-            />
+            <q-btn flat color="primary" no-caps label="Register" @click="goToRegister" />
           </div>
         </q-form>
       </q-card>

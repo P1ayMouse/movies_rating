@@ -90,10 +90,7 @@ export default {
 
 <template>
   <div class="text-font">
-    <!--    <div v-if="formError" class="alert alert-danger" role="alert">-->
-    <!--      {{ formError }}-->
-    <!--    </div>-->
-    <div class="d-flex justify-content-center align-items-center">
+    <div class="row justify-center items-center">
       <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
         <q-card-section class="text-h5 text-center q-mb-md"> Profile </q-card-section>
         <q-form @submit.prevent="onUserEditProfile" class="q-gutter-md">
