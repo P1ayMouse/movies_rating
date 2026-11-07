@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 
 import 'quasar/src/css/index.sass';
+import './styles/main.scss';
 import { Quasar } from 'quasar';
 import quasarUserOptions from './quasar-user-options';
 

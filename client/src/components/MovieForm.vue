@@ -128,7 +128,7 @@ export default {
 </script>
 
 <template>
-  <div class="q-pa-md">
+  <div class="movie-page q-pa-md">
     <div v-if="!dataLoaded">
       <div class="text-center q-my-xl">
         <q-spinner-dots color="black" size="64px" />
@@ -145,7 +145,7 @@ export default {
                     ? movie.poster
                     : '/src/components/icons/none_image.png'
                 "
-                class="movie-poster rounded-borders"
+                class="movie-poster"
                 :ratio="0.67"
                 :img-class="'high-quality'"
               />
@@ -244,7 +244,7 @@ export default {
                 <p class="text-subtitle1">Number #{{ index + 1 }}</p>
                 <q-img
                   :src="movie.poster ? movie.poster : '/src/components/icons/none_image.png'"
-                  class="rounded-borders q-my-md movie-poster"
+                  class="q-my-md movie-poster"
                   :alt="movie.name"
                 />
                 <p class="text-subtitle1">{{ movie.name }}</p>
@@ -263,196 +263,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style scoped>
-.movie-header {
-  background-color: #f5f5f5;
-  padding: 16px;
-  border-bottom: 1px solid #ddd;
-}
-
-.movie-title-container {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-.movie-title {
-  font-size: 2.5em;
-  margin: 0;
-}
-
-.movie-year {
-  font-size: 1.25em;
-  color: rgb(128, 128, 128);
-  margin: 0;
-}
-
-.movie-genres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 1.2em;
-  color: rgb(70, 70, 70);
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.directors {
-  font-size: 1em;
-}
-
-.movie-poster {
-  width: 100%;
-  max-width: 300px;
-  height: auto;
-  object-fit: cover;
-}
-
-.details p {
-  margin: 0.5em 0;
-  padding: 0;
-}
-
-.details strong {
-  font-weight: bold;
-}
-
-.rating-card {
-  position: fixed;
-  top: 60px;
-  right: -300px;
-  width: 300px;
-  height: calc(100% - 50px);
-  background-color: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  transition: right 0.3s ease;
-  z-index: 999;
-  overflow-y: auto;
-  padding-bottom: 20px;
-}
-
-.rating-card.open {
-  right: 0;
-}
-
-.rating {
-  width: 0;
-  justify-content: center;
-  gap: 0.25rem;
-  margin-top: 10px;
-  flex-wrap: nowrap;
-}
-
-.rounded-borders {
-  border-radius: 10px;
-}
-
-.button-container {
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.styled-button {
-  margin-top: 10px;
-  background-color: #6c757d;
-  color: white;
-  border-radius: 50px;
-  padding: 5px 15px;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease;
-}
-
-.styled-button:hover {
-  background-color: #5a6268;
-}
-
-.top-rated-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-}
-
-.top-rated-card {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  background-color: #f9f9f9;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.top-rated-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.top-rated-card .text-subtitle1 {
-  font-size: 1.1em;
-  margin: 5px 0;
-}
-
-.top-rated-card .text-caption {
-  font-size: 0.9em;
-  color: #555;
-}
-
-@media screen and (max-width: 1023.2px) {
-  .movie-title-container {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .movie-genres {
-    justify-content: center;
-  }
-
-  .directors {
-    text-align: center;
-  }
-
-  .button-container {
-    justify-content: center;
-  }
-
-  .rating-card {
-    width: 100%;
-    height: auto;
-    position: static;
-    transform: none;
-    box-shadow: none;
-    margin-top: 20px;
-  }
-
-  .top-rated-container {
-    align-items: center;
-  }
-
-  .top-rated-card {
-    max-width: 80%;
-    margin-bottom: 10px;
-  }
-
-  .movie-details {
-    width: 100%;
-  }
-
-  .rating {
-    gap: 0.1rem;
-  }
-}
-</style>

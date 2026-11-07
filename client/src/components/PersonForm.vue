@@ -103,7 +103,7 @@ export default {
 </script>
 
 <template>
-  <div class="q-pa-md">
+  <div class="person-page q-pa-md">
     <div v-if="!personLoaded">
       <div class="text-center q-my-xl">
         <q-spinner-dots color="black" size="64px" />
@@ -120,7 +120,7 @@ export default {
                     ? person.photo
                     : '/src/components/icons/none_image.png'
                 "
-                class="person-photo rounded-borders"
+                class="person-photo"
                 :ratio="0.67"
                 :img-class="'high-quality'"
               />
@@ -179,85 +179,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style scoped>
-.person-header {
-  background-color: #f5f5f5;
-  padding: 16px;
-  border-bottom: 1px solid #ddd;
-}
-
-.person-title-container {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-.person-title {
-  font-size: 2.5em;
-  margin: 0;
-}
-
-.person-year {
-  font-size: 1.25em;
-  color: rgb(128, 128, 128);
-  margin: 0;
-}
-
-.person-photo {
-  width: 100%;
-  max-width: 300px;
-  height: auto;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.styled-button {
-  margin-top: 10px;
-  background-color: #6c757d;
-  color: white;
-  border-radius: 50px;
-  padding: 5px 15px;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease;
-}
-
-.styled-button:hover {
-  background-color: #5a6268;
-}
-
-.button-container {
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-@media screen and (max-width: 1023.2px) {
-  .person-title-container {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .person-title {
-    font-size: 28px;
-  }
-
-  .person-year {
-    text-align: center;
-  }
-
-  .button-container {
-    justify-content: center;
-  }
-
-  .person-photo-center,
-  .person-details {
-    width: 100%;
-  }
-}
-</style>

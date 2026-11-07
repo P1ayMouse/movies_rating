@@ -1,0 +1,11 @@
+@use 'variables' as *;
+
+body {
+  color: $text-color;
+  background-color: $page-bg;
+}
+
+.text-font {
+  font-family: $font-family;
+  text-decoration: none;
+}

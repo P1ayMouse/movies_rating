@@ -1,0 +1,155 @@
+@use 'variables' as *;
+
+.movie-page {
+  .movie-header {
+    background-color: $card-header-bg;
+    padding: 16px;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .movie-poster {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    object-fit: cover;
+    border-radius: $radius;
+  }
+
+  .rating {
+    width: 0;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .movie-title-container {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .movie-title {
+    font-size: 2.5em;
+    margin: 0;
+  }
+
+  .movie-year {
+    font-size: 1.25em;
+    color: $gray-text;
+    margin: 0;
+  }
+
+  .movie-genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 1.2em;
+    color: rgb(70, 70, 70);
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .directors {
+    font-size: 1em;
+  }
+
+  // "Top Rated Like This" side panel
+  .rating-card {
+    position: fixed;
+    top: 60px;
+    right: -300px;
+    width: 300px;
+    height: calc(100% - 50px);
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+    padding-bottom: 20px;
+
+    &.open {
+      right: 0;
+    }
+  }
+
+  .top-rated-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .top-rated-card {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    border: 1px solid $border-color;
+    padding: 10px;
+    border-radius: $radius;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    background-color: #f9f9f9;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .text-subtitle1 {
+      font-size: 1.1em;
+      margin: 5px 0;
+    }
+
+    .text-caption {
+      font-size: 0.9em;
+      color: $muted-text;
+    }
+  }
+
+  @media screen and (max-width: $page-mobile) {
+    .movie-title-container {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .movie-genres {
+      justify-content: center;
+    }
+
+    .directors {
+      text-align: center;
+    }
+
+    .movie-details {
+      width: 100%;
+    }
+
+    .rating {
+      gap: 0.1rem;
+    }
+
+    .rating-card {
+      width: 100%;
+      height: auto;
+      position: static;
+      transform: none;
+      box-shadow: none;
+      margin-top: 20px;
+    }
+
+    .top-rated-container {
+      align-items: center;
+    }
+
+    .top-rated-card {
+      max-width: 80%;
+      margin-bottom: 10px;
+    }
+  }
+}

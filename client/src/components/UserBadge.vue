@@ -71,16 +71,3 @@ export default {
     <q-btn flat color="primary" no-caps label="Login" @click="goToLogin" />
   </div>
 </template>
-
-<style scoped>
-.user-dropdown {
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.q-btn-dropdown__menu {
-  overflow-x: hidden;
-}
-</style>

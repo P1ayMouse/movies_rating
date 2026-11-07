@@ -86,7 +86,7 @@ export default {
 </script>
 
 <template>
-  <div class="text-font">
+  <div class="auth-form text-font">
     <div class="row justify-center items-center">
       <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
         <q-card-section class="text-h5 text-center q-mb-md"> Register </q-card-section>
@@ -144,18 +144,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style scoped>
-.text-font {
-  text-decoration: none;
-  font-family: 'Comic Sans MS', sans-serif;
-  color: black;
-}
-.form-button {
-  border-radius: 5px;
-}
-.notification {
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-</style>
