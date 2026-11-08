@@ -1,10 +1,11 @@
 <script>
-import { QPagination, QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip } from 'quasar';
+import { QSpinnerDots, QCard, QCardSection, QImg, QIcon, QChip } from 'quasar';
+import MoviePagination from './MoviePagination.vue';
 
 export default {
   name: 'MoviesListForm',
   components: {
-    QPagination,
+    MoviePagination,
     QSpinnerDots,
     QCard,
     QCardSection,
@@ -72,21 +73,8 @@ export default {
       </div>
     </div>
     <div v-else class="movie-container">
-      <div class="pagination-container" v-if="totalPages > 1">
-        <q-pagination
-          v-model="page"
-          :max="totalPages"
-          :max-pages="1"
-          direction-links
-          boundary-links
-          :ellipses="false"
-          :boundary-numbers="false"
-          icon-first="skip_previous"
-          icon-last="skip_next"
-          icon-prev="fast_rewind"
-          icon-next="fast_forward"
-          class="pagination-mobile"
-        />
+      <div v-if="totalPages > 1" class="pagination-container pagination-container--top">
+        <movie-pagination v-model="page" :total-pages="totalPages" />
       </div>
       <div class="movies-grid">
         <div v-for="movie in movies" :key="movie.id" class="movie-card-container">
@@ -124,37 +112,8 @@ export default {
         </div>
       </div>
 
-      <br /><br />
-
-      <div class="pagination-container" v-if="totalPages > 1">
-        <q-pagination
-          v-model="page"
-          :max="totalPages"
-          :max-pages="6"
-          direction-links
-          boundary-links
-          :ellipses="false"
-          :boundary-numbers="false"
-          icon-first="skip_previous"
-          icon-last="skip_next"
-          icon-prev="fast_rewind"
-          icon-next="fast_forward"
-          class="pagination-desktop"
-        />
-        <q-pagination
-          v-model="page"
-          :max="totalPages"
-          :max-pages="1"
-          direction-links
-          boundary-links
-          :ellipses="false"
-          :boundary-numbers="false"
-          icon-first="skip_previous"
-          icon-last="skip_next"
-          icon-prev="fast_rewind"
-          icon-next="fast_forward"
-          class="pagination-mobile"
-        />
+      <div v-if="totalPages > 1" class="pagination-container">
+        <movie-pagination v-model="page" :total-pages="totalPages" />
       </div>
       <div v-else-if="count === 0 && moviesLoaded" class="no-movies">
         <h2>Movies not found</h2>
