@@ -243,7 +243,11 @@ export default {
               <q-card-section>
                 <p class="text-subtitle1">Number #{{ index + 1 }}</p>
                 <q-img
-                  :src="movie.poster ? movie.poster : '/src/components/icons/none_image.png'"
+                  :src="
+                    movie.poster && movie.poster !== 'None'
+                      ? movie.poster
+                      : '/src/components/icons/none_image.png'
+                  "
                   class="q-my-md movie-poster"
                   :alt="movie.name"
                 />
