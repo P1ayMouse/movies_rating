@@ -1,55 +1,9 @@
-@use 'variables' as *;
-
+// Person page parts that the movie page does not have.
+// Shared layout is in _detail-page.scss.
 .person-page {
-  .person-header {
-    background-color: $card-header-bg;
-    padding: 16px;
-    border-bottom: 1px solid $border-color;
-  }
-
-  .person-photo {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-    object-fit: cover;
-    border-radius: $radius;
-  }
-
-  .person-title-container {
+  .person-facts {
     display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-  }
-
-  .person-title {
-    font-size: 2.5em;
-    margin: 0;
-  }
-
-  .person-year {
-    font-size: 1.25em;
-    color: $gray-text;
-    margin: 0;
-  }
-
-  @media screen and (max-width: $page-mobile) {
-    .person-title-container {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .person-title {
-      font-size: 28px;
-    }
-
-    .person-year {
-      text-align: center;
-    }
-
-    .person-photo-center,
-    .person-details {
-      width: 100%;
-    }
+    flex-wrap: wrap;
+    gap: 12px 40px;
   }
 }

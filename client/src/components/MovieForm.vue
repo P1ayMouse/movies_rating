@@ -159,32 +159,32 @@ export default {
 </script>
 
 <template>
-  <div class="movie-page">
-    <router-link :to="{ name: 'movies' }" class="movie-back-link">
+  <div class="detail-page movie-page">
+    <router-link :to="{ name: 'movies' }" class="detail-back-link">
       <q-icon name="arrow_back" size="18px" aria-hidden="true" />
       Back to movies
     </router-link>
 
-    <div v-if="loading" class="movie-status" role="status">
+    <div v-if="loading" class="detail-status" role="status">
       <q-spinner-dots color="grey-8" size="40px" aria-hidden="true" />
       <p>Loading movie details…</p>
     </div>
 
-    <div v-else-if="errorMessage" class="movie-status" role="alert">
+    <div v-else-if="errorMessage" class="detail-status" role="alert">
       <h1>{{ movieNotFound ? 'Movie not found' : 'Unable to load movie' }}</h1>
       <p>{{ errorMessage }}</p>
       <q-btn v-if="!movieNotFound" outline no-caps label="Try again" @click="fetchData" />
     </div>
 
     <template v-else>
-      <section class="movie-overview" aria-labelledby="movie-title">
-        <div class="movie-summary">
-          <div class="movie-heading">
-            <p v-if="releaseYear" class="movie-year">{{ releaseYear }}</p>
-            <h1 id="movie-title" class="movie-title">{{ movie.name }}</h1>
+      <section class="detail-overview" aria-labelledby="movie-title">
+        <div class="detail-summary">
+          <div class="detail-heading">
+            <p v-if="releaseYear" class="detail-overline">{{ releaseYear }}</p>
+            <h1 id="movie-title" class="detail-title">{{ movie.name }}</h1>
           </div>
 
-          <div class="movie-meta">
+          <div class="detail-meta">
             <ul v-if="movie.genres?.length" class="movie-genres" aria-label="Genres">
               <li v-for="genre in movie.genres" :key="genre">{{ genre }}</li>
             </ul>
@@ -203,14 +203,14 @@ export default {
             </div>
           </div>
 
-          <dl v-if="movie.directors?.length" class="movie-facts">
+          <dl v-if="movie.directors?.length" class="detail-facts">
             <dt>{{ movie.directors.length === 1 ? 'Director' : 'Directors' }}</dt>
             <dd>{{ movie.directors.join(', ') }}</dd>
           </dl>
 
-          <div v-if="movie.imdb_id" class="movie-actions">
+          <div v-if="movie.imdb_id" class="detail-actions">
             <q-btn
-              class="movie-imdb-button"
+              class="detail-imdb-button"
               unelevated
               no-caps
               label="View on IMDb"
@@ -223,22 +223,22 @@ export default {
           </div>
         </div>
 
-        <div class="movie-poster-frame">
+        <div class="detail-media">
           <q-img
             v-if="posterUrl(movie)"
             :src="posterUrl(movie)"
             :alt="`Poster for ${movie.name}`"
             :ratio="2 / 3"
-            class="movie-poster"
+            class="detail-media-image"
           >
             <template #error>
-              <div class="movie-poster-placeholder">
+              <div class="detail-placeholder">
                 <q-icon name="image_not_supported" size="36px" aria-hidden="true" />
                 <span>Poster unavailable</span>
               </div>
             </template>
           </q-img>
-          <div v-else class="movie-poster-placeholder">
+          <div v-else class="detail-placeholder">
             <q-icon name="image_not_supported" size="36px" aria-hidden="true" />
             <span>Poster unavailable</span>
           </div>
@@ -247,14 +247,14 @@ export default {
 
       <section
         v-if="peopleLoading || peopleError || people.length"
-        class="movie-section"
+        class="detail-section"
         aria-labelledby="movie-credits-title"
       >
         <h2 id="movie-credits-title">Cast &amp; crew</h2>
-        <p v-if="peopleLoading" class="movie-section-message" role="status">
+        <p v-if="peopleLoading" class="detail-section-message" role="status">
           Loading cast &amp; crew…
         </p>
-        <div v-else-if="peopleError" class="movie-section-message" role="status">
+        <div v-else-if="peopleError" class="detail-section-message" role="status">
           <p>Cast &amp; crew could not be loaded.</p>
           <q-btn flat no-caps label="Try again" @click="loadPeople()" />
         </div>
@@ -284,25 +284,25 @@ export default {
         </q-table>
       </section>
 
-      <section id="similar-movies" class="movie-section" aria-labelledby="similar-movies-title">
+      <section id="similar-movies" class="detail-section" aria-labelledby="similar-movies-title">
         <h2 id="similar-movies-title">Similar movies</h2>
-        <p class="movie-section-description">Popular picks in the same genres.</p>
+        <p class="detail-section-description">Popular picks in the same genres.</p>
 
-        <p v-if="similarLoading" class="movie-section-message" role="status">
+        <p v-if="similarLoading" class="detail-section-message" role="status">
           Finding similar movies…
         </p>
-        <div v-else-if="similarError" class="movie-section-message" role="status">
+        <div v-else-if="similarError" class="detail-section-message" role="status">
           <p>Similar movies could not be loaded.</p>
           <q-btn flat no-caps label="Try again" @click="loadSimilarMovies()" />
         </div>
-        <div v-else-if="similarMovies.length" class="similar-movies-grid">
+        <div v-else-if="similarMovies.length" class="movie-tiles">
           <router-link
             v-for="similarMovie in similarMovies"
             :key="similarMovie.id"
             :to="{ name: 'movie', params: { id: similarMovie.id } }"
-            class="similar-movie-card"
+            class="movie-tile"
           >
-            <div class="similar-movie-poster">
+            <div class="movie-tile-poster">
               <q-img
                 v-if="posterUrl(similarMovie)"
                 :src="posterUrl(similarMovie)"
@@ -310,28 +310,28 @@ export default {
                 :ratio="2 / 3"
               >
                 <template #error>
-                  <div class="movie-poster-placeholder">
+                  <div class="detail-placeholder">
                     <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
                   </div>
                 </template>
               </q-img>
-              <div v-else class="movie-poster-placeholder">
+              <div v-else class="detail-placeholder">
                 <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
               </div>
             </div>
-            <div class="similar-movie-info">
+            <div class="movie-tile-info">
               <h3>{{ similarMovie.name }}</h3>
               <p v-if="similarMovie.year">{{ String(similarMovie.year).slice(0, 4) }}</p>
-              <span v-if="formatRating(similarMovie.average_rating)" class="similar-movie-rating">
+              <span v-if="formatRating(similarMovie.average_rating)" class="movie-tile-rating">
                 <q-icon name="star" size="18px" aria-hidden="true" />
                 {{ formatRating(similarMovie.average_rating) }}
-                <span class="similar-movie-rating-scale">/ 10</span>
+                <span class="movie-tile-rating-scale">/ 10</span>
               </span>
-              <span v-else class="similar-movie-unrated">Not yet rated</span>
+              <span v-else class="movie-tile-unrated">Not yet rated</span>
             </div>
           </router-link>
         </div>
-        <p v-else class="movie-section-message">No similar movies are available yet.</p>
+        <p v-else class="detail-section-message">No similar movies are available yet.</p>
       </section>
     </template>
   </div>

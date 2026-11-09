@@ -1,181 +1,229 @@
 <script>
-import router from '../router';
-import { QCard, QCardSection, QImg, QBtn, QTable, QTd, QSpinnerDots } from 'quasar';
+import { QBtn, QIcon, QImg, QSpinnerDots } from 'quasar';
 
 export default {
   name: 'PersonForm',
-  components: {
-    QCard,
-    QCardSection,
-    QImg,
-    QBtn,
-    QTable,
-    QTd,
-    QSpinnerDots
-  },
+  components: { QBtn, QIcon, QImg, QSpinnerDots },
   data() {
     return {
-      personLoaded: false,
+      loading: true,
+      errorMessage: '',
+      personNotFound: false,
       person: {},
-      columns: [
-        {
-          name: 'name',
-          required: true,
-          label: 'Name',
-          align: 'left',
-          field: 'name',
-          format: (val) => `${val}`,
-          sortable: true
-        },
-        {
-          name: 'average_rating',
-          align: 'left',
-          label: 'Average Rating',
-          field: 'average_rating',
-          sortable: true
-        },
-        {
-          name: 'genres',
-          align: 'left',
-          label: 'Genres',
-          field: 'genres',
-          format: (val) => val.join('; '),
-          sortable: true
-        }
-      ]
+      knownFor: [],
+      knownForLoading: false,
+      knownForError: false,
+      requestId: 0
     };
   },
-  async mounted() {
+  computed: {
+    birthYear() {
+      return this.person.birth_year ? String(this.person.birth_year).slice(0, 4) : '';
+    },
+    deathYear() {
+      return this.person.death_year ? String(this.person.death_year).slice(0, 4) : '';
+    }
+  },
+  mounted() {
     this.fetchData();
   },
   watch: {
-    $route() {
-      this.fetchData();
+    '$route.params.id'(id) {
+      if (id) this.fetchData();
     }
+  },
+  beforeUnmount() {
+    this.requestId += 1;
   },
   methods: {
     async fetchData() {
-      this.personLoaded = false;
-      const urlPersonMovie = `/api/v1/movies/persons/${this.$route.params.id}`;
+      const requestId = ++this.requestId;
+      this.loading = true;
+      this.errorMessage = '';
+      this.personNotFound = false;
+      this.knownFor = [];
+      this.knownForError = false;
+      document.title = 'Person | Diploma MDB';
 
       try {
-        const response = await fetch(urlPersonMovie);
-        const data = await response.json();
-
-        this.person = data;
-
-        if (this.person.known_for_titles.length > 0) {
-          await Promise.all(
-            this.person.known_for_titles.map(async (imdb_id) => {
-              const movieUrl = `/api/v1/movies/?search=${imdb_id}`;
-              const movieResponse = await fetch(movieUrl);
-              const movieData = await movieResponse.json();
-              if (movieData.results.length > 0) {
-                if (!this.person.knownForMovies) {
-                  this.person.knownForMovies = [];
-                }
-                this.person.knownForMovies.push(movieData.results[0]);
-              }
-            })
-          );
+        const response = await fetch(`/api/v1/movies/persons/${this.$route.params.id}/`);
+        if (requestId !== this.requestId) return;
+        if (!response.ok) {
+          this.personNotFound = response.status === 404;
+          throw new Error('Person request failed');
         }
 
-        document.title = `${this.person.name} (${this.person.imdb_id})`;
-        this.personLoaded = true;
-      } catch (error) {
-        console.error(error);
+        const person = await response.json();
+        if (requestId !== this.requestId) return;
+        this.person = person;
+        document.title = `${person.name} | Diploma MDB`;
+        this.loading = false;
+
+        await this.loadKnownFor(requestId);
+      } catch {
+        if (requestId !== this.requestId) return;
+        this.errorMessage = this.personNotFound
+          ? 'This person could not be found. Browse the catalog to find another one.'
+          : 'We could not load this person. Please try again.';
+      } finally {
+        if (requestId === this.requestId) this.loading = false;
       }
     },
-    goToMoviePage(movieId) {
-      router.push({ name: 'movie', params: { id: movieId } });
+    async loadKnownFor(requestId = this.requestId) {
+      this.knownForLoading = true;
+      this.knownForError = false;
+
+      try {
+        const results = await Promise.all(
+          (this.person.known_for_titles || []).map(async (imdbId) => {
+            const response = await fetch(`/api/v1/movies/?imdb_id=${encodeURIComponent(imdbId)}`);
+            if (!response.ok) throw new Error('Known for request failed');
+            const data = await response.json();
+            return data.results[0];
+          })
+        );
+        if (requestId === this.requestId) this.knownFor = results.filter(Boolean);
+      } catch {
+        if (requestId === this.requestId) this.knownForError = true;
+      } finally {
+        if (requestId === this.requestId) this.knownForLoading = false;
+      }
     },
-    viewOnIMDb() {
-      window.open(`https://www.imdb.com/name/${this.person.imdb_id}`, '_blank');
+    formatRating(value) {
+      const rating = Number(value);
+      return Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : null;
     },
-    formatJob(job) {
-      return job
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+    imageUrl(value) {
+      return value && value !== 'None' ? value : undefined;
     }
   }
 };
 </script>
 
 <template>
-  <div class="person-page q-pa-md">
-    <div v-if="!personLoaded">
-      <div class="text-center q-my-xl">
-        <q-spinner-dots color="black" size="64px" />
-      </div>
+  <div class="detail-page person-page">
+    <router-link :to="{ name: 'movies' }" class="detail-back-link">
+      <q-icon name="arrow_back" size="18px" aria-hidden="true" />
+      Back to movies
+    </router-link>
+
+    <div v-if="loading" class="detail-status" role="status">
+      <q-spinner-dots color="grey-8" size="40px" aria-hidden="true" />
+      <p>Loading person details…</p>
     </div>
-    <div v-else>
-      <q-card class="q-ma-md">
-        <q-card-section class="person-header">
-          <div class="row">
-            <div class="col-md-4 person-photo-center text-center">
+
+    <div v-else-if="errorMessage" class="detail-status" role="alert">
+      <h1>{{ personNotFound ? 'Person not found' : 'Unable to load person' }}</h1>
+      <p>{{ errorMessage }}</p>
+      <q-btn v-if="!personNotFound" outline no-caps label="Try again" @click="fetchData" />
+    </div>
+
+    <template v-else>
+      <section class="detail-overview" aria-labelledby="person-name">
+        <div class="detail-summary">
+          <div class="detail-heading">
+            <h1 id="person-name" class="detail-title">{{ person.name }}</h1>
+          </div>
+
+          <div class="detail-meta">
+            <dl v-if="birthYear || deathYear" class="detail-facts person-facts">
+              <div v-if="birthYear">
+                <dt>Born</dt>
+                <dd>{{ birthYear }}</dd>
+              </div>
+              <div v-if="deathYear">
+                <dt>Died</dt>
+                <dd>{{ deathYear }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div v-if="person.imdb_id" class="detail-actions">
+            <q-btn
+              class="detail-imdb-button"
+              unelevated
+              no-caps
+              label="View on IMDb"
+              icon-right="open_in_new"
+              :href="`https://www.imdb.com/name/${person.imdb_id}/`"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View on IMDb (opens in a new tab)"
+            />
+          </div>
+        </div>
+
+        <div class="detail-media">
+          <q-img
+            v-if="imageUrl(person.photo)"
+            :src="imageUrl(person.photo)"
+            :alt="`Photo of ${person.name}`"
+            :ratio="2 / 3"
+            class="detail-media-image"
+          >
+            <template #error>
+              <div class="detail-placeholder">
+                <q-icon name="person" size="36px" aria-hidden="true" />
+                <span>Photo unavailable</span>
+              </div>
+            </template>
+          </q-img>
+          <div v-else class="detail-placeholder">
+            <q-icon name="person" size="36px" aria-hidden="true" />
+            <span>Photo unavailable</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-section" aria-labelledby="known-for-title">
+        <h2 id="known-for-title">Known for</h2>
+        <p class="detail-section-description">Best-known titles that are in this catalog.</p>
+
+        <p v-if="knownForLoading" class="detail-section-message" role="status">Loading movies…</p>
+        <div v-else-if="knownForError" class="detail-section-message" role="status">
+          <p>Movies could not be loaded.</p>
+          <q-btn flat no-caps label="Try again" @click="loadKnownFor()" />
+        </div>
+        <div v-else-if="knownFor.length" class="movie-tiles">
+          <router-link
+            v-for="movie in knownFor"
+            :key="movie.id"
+            :to="{ name: 'movie', params: { id: movie.id } }"
+            class="movie-tile"
+          >
+            <div class="movie-tile-poster">
               <q-img
-                :src="
-                  person.photo && person.photo !== 'None'
-                    ? person.photo
-                    : '/src/components/icons/none_image.png'
-                "
-                class="person-photo"
-                :ratio="0.67"
-                :img-class="'high-quality'"
-              />
-            </div>
-            <div class="col-md-8 person-details">
-              <div class="text-left q-ml-lg q-mt-md q-mt-none-md">
-                <div class="person-title-container">
-                  <p class="person-title">{{ person.name }}</p>
-                </div>
-                <p class="person-year">
-                  <span v-if="person.birth_year">{{
-                    person.birth_year ? person.birth_year.slice(0, 4) : ''
-                  }}</span>
-                  <span v-if="person.death_year && person.birth_year">
-                    - {{ person.death_year.slice(0, 4) }}</span
-                  >
-                </p>
-                <div class="button-container">
-                  <q-btn @click="viewOnIMDb" class="styled-button" icon="person" />
-                </div>
+                v-if="imageUrl(movie.poster)"
+                :src="imageUrl(movie.poster)"
+                alt=""
+                :ratio="2 / 3"
+              >
+                <template #error>
+                  <div class="detail-placeholder">
+                    <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
+                  </div>
+                </template>
+              </q-img>
+              <div v-else class="detail-placeholder">
+                <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
               </div>
             </div>
-          </div>
-        </q-card-section>
-      </q-card>
-
-      <q-card flat class="q-ma-md" v-if="person.knownForMovies && person.knownForMovies.length > 0">
-        <q-card-section>
-          <q-table
-            :rows="person.knownForMovies"
-            :columns="columns"
-            row-key="name"
-            flat
-            bordered
-            hide-pagination
-          >
-            <template v-slot:body-cell-name="props">
-              <q-td :props="props" data-label="Name">
-                <q-btn
-                  flat
-                  @click="goToMoviePage(props.row.id)"
-                  class="q-ml-sm"
-                  style="text-transform: none"
-                  >{{ props.row.name }}</q-btn
-                >
-              </q-td>
-            </template>
-            <template v-slot:body-cell-genres="props">
-              <q-td :props="props" data-label="Genres">
-                {{ props.row.genres.join('; ') }}
-              </q-td>
-            </template>
-          </q-table>
-        </q-card-section>
-      </q-card>
-    </div>
+            <div class="movie-tile-info">
+              <h3>{{ movie.name }}</h3>
+              <p v-if="movie.year">{{ String(movie.year).slice(0, 4) }}</p>
+              <span v-if="formatRating(movie.average_rating)" class="movie-tile-rating">
+                <q-icon name="star" size="18px" aria-hidden="true" />
+                {{ formatRating(movie.average_rating) }}
+                <span class="movie-tile-rating-scale">/ 10</span>
+              </span>
+              <span v-else class="movie-tile-unrated">Not yet rated</span>
+            </div>
+          </router-link>
+        </div>
+        <p v-else class="detail-section-message">
+          None of {{ person.name }}'s best-known titles are in the catalog yet.
+        </p>
+      </section>
+    </template>
   </div>
 </template>
