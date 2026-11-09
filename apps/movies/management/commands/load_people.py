@@ -1,7 +1,82 @@
 import csv
+
 from django.core.management import BaseCommand
-from apps.movies.models import Person, Movie
-from django.db import transaction
+
+from apps.movies.models import Movie, Person
+
+IMDB_NULL = '\\N'
+
+
+class Command(BaseCommand):
+    help = (
+        'Load people from IMDb name.basics.tsv who are known for a movie in the database. '
+        'People already in the database are skipped, so each run adds new ones.'
+    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('-f', '--file', required=True, help='Path to name.basics.tsv')
+        parser.add_argument('--limit', type=int, help='Add at most this many new people (default: all).')
+        parser.add_argument('--batch-size', type=int, default=5000, help='People saved per database query.')
+
+    def handle(self, *args, file, limit, batch_size, **options):
+        movie_ids = set(Movie.objects.values_list('imdb_id', flat=True))
+        known = set(Person.objects.values_list('imdb_id', flat=True))
+        already_saved = len(known)
+        saved = 0
+
+        for batch in read_batches(file, batch_size, limit, movie_ids, known):
+            Person.objects.bulk_create(batch)
+            saved += len(batch)
+            for person in batch:
+                self.stdout.write(person.name)
+
+        self.stdout.write(self.style.SUCCESS(
+            f'Done: {saved:,} new people saved, {already_saved:,} were already in the database'
+        ))
+
+
+def read_batches(path, size, limit, movie_ids, known):
+    """Yields lists of up to `size` new people, `limit` in total. `known` holds imdb_ids to skip and is updated."""
+    batch = []
+    total = 0
+
+    with open(path, newline='') as f:
+        rows = csv.reader(f, delimiter='\t', quoting=csv.QUOTE_NONE)
+        next(rows, None)  # header
+
+        for row in rows:
+            if limit is not None and total >= limit:
+                break
+
+            person = parse_row(row, movie_ids)
+            if person is None or person.imdb_id in known:
+                continue
+
+            known.add(person.imdb_id)
+            batch.append(person)
+            total += 1
+            if len(batch) >= size:
+                yield batch
+                batch = []
+
+    if batch:
+        yield batch
+
+
+def parse_row(row, movie_ids):
+    imdb_id, name, birth_year, death_year, _professions, known_for = row
+
+    known_for_titles = [] if known_for == IMDB_NULL else known_for.split(',')
+    if movie_ids.isdisjoint(known_for_titles):
+        return None
+
+    return Person(
+        imdb_id=imdb_id,
+        name=name,
+        birth_year=year_to_date(birth_year),
+        death_year=year_to_date(death_year),
+        known_for_titles=known_for_titles,
+    )
 
 
 def year_to_date(value):
@@ -9,49 +84,3 @@ def year_to_date(value):
     if not value.isdigit() or int(value) == 0:
         return None
     return f'{int(value):04d}-01-01'
-
-
-class Command(BaseCommand):
-    def add_arguments(self, parser):
-        parser.add_argument('-f', '--file', type=str)
-        parser.add_argument('--delimiter', type=str, default='\t')
-
-    def handle(self, **options):
-        file_name = options.get('file')
-        max_rows = 50000
-
-        with open(file_name) as f:
-            csv_data = csv.reader(f, delimiter=options.get('delimiter', '\t'))
-
-            # Отримання ідентифікаторів фільмів, що вже є в базі даних
-            existing_movie_ids = set(Movie.objects.values_list('imdb_id', flat=True))
-
-            with transaction.atomic():
-                rows_processed = 0  # Лічильник оброблених рядків
-
-                for row in csv_data:
-                    if max_rows is not None and rows_processed >= max_rows:
-                        break  # Зупинити обробку, якщо досягнута максимальна кількість рядків
-
-                    movies_imdb_id = row[5].split(',') if row[5] != '\\N' else []
-
-                    # Перевірка, чи є фільми, які відповідають поточній персоні, у базі даних
-                    if not set(movies_imdb_id) & existing_movie_ids:
-                        continue
-
-                    row_data = {
-                        'imdb_id': row[0],
-                        'name': row[1],
-                        'birth_year': year_to_date(row[2]),
-                        'death_year': year_to_date(row[3]),
-                        'known_for_titles': movies_imdb_id,
-                    }
-
-                    # Використання get_or_create для уникнення дублювання даних
-                    person, created = Person.objects.get_or_create(imdb_id=row_data['imdb_id'], defaults=row_data)
-                    if not created:
-                        Person.objects.filter(id=person.id).update(**row_data)
-
-                    rows_processed += 1  # Збільшити лічильник оброблених рядків на 1
-
-                    print(rows_processed, row_data)

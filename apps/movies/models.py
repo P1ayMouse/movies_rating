@@ -36,6 +36,11 @@ class PersonMovie(models.Model):
     job = models.CharField(_('Job'), max_length=255, null=True)
     characters = ArrayField(models.CharField(_('Characters'), max_length=255))
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['movie_id', 'person_id'], name='unique_person_movie'),
+        ]
+
 
 class Rating(models.Model):
     movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
