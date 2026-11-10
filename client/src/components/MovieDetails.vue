@@ -1,9 +1,12 @@
 <script>
-import { QBtn, QIcon, QImg, QSpinnerDots, QTable, QTd } from 'quasar';
+import { QBtn, QIcon, QSpinnerDots, QTable, QTd } from 'quasar';
+import MovieTile from './MovieTile.vue';
+import PosterImage from './PosterImage.vue';
+import { formatRating, yearOf } from '../format.js';
 
 export default {
-  name: 'MovieForm',
-  components: { QBtn, QIcon, QImg, QSpinnerDots, QTable, QTd },
+  name: 'MovieDetails',
+  components: { MovieTile, PosterImage, QBtn, QIcon, QSpinnerDots, QTable, QTd },
   data() {
     return {
       loading: true,
@@ -45,7 +48,7 @@ export default {
   },
   computed: {
     releaseYear() {
-      return this.movie.year ? String(this.movie.year).slice(0, 4) : '';
+      return yearOf(this.movie.year);
     },
     voteCount() {
       return new Intl.NumberFormat('en').format(this.movie.num_votes || 0);
@@ -147,13 +150,7 @@ export default {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
     },
-    formatRating(value) {
-      const rating = Number(value);
-      return Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : null;
-    },
-    posterUrl(movie) {
-      return movie.poster && movie.poster !== 'None' ? movie.poster : undefined;
-    }
+    formatRating
   }
 };
 </script>
@@ -224,24 +221,11 @@ export default {
         </div>
 
         <div class="detail-media">
-          <q-img
-            v-if="posterUrl(movie)"
-            :src="posterUrl(movie)"
+          <poster-image
+            :src="movie.poster"
             :alt="`Poster for ${movie.name}`"
-            :ratio="2 / 3"
-            class="detail-media-image"
-          >
-            <template #error>
-              <div class="detail-placeholder">
-                <q-icon name="image_not_supported" size="36px" aria-hidden="true" />
-                <span>Poster unavailable</span>
-              </div>
-            </template>
-          </q-img>
-          <div v-else class="detail-placeholder">
-            <q-icon name="image_not_supported" size="36px" aria-hidden="true" />
-            <span>Poster unavailable</span>
-          </div>
+            label="Poster unavailable"
+          />
         </div>
       </section>
 
@@ -296,40 +280,11 @@ export default {
           <q-btn flat no-caps label="Try again" @click="loadSimilarMovies()" />
         </div>
         <div v-else-if="similarMovies.length" class="movie-tiles">
-          <router-link
+          <movie-tile
             v-for="similarMovie in similarMovies"
             :key="similarMovie.id"
-            :to="{ name: 'movie', params: { id: similarMovie.id } }"
-            class="movie-tile"
-          >
-            <div class="movie-tile-poster">
-              <q-img
-                v-if="posterUrl(similarMovie)"
-                :src="posterUrl(similarMovie)"
-                alt=""
-                :ratio="2 / 3"
-              >
-                <template #error>
-                  <div class="detail-placeholder">
-                    <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
-                  </div>
-                </template>
-              </q-img>
-              <div v-else class="detail-placeholder">
-                <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
-              </div>
-            </div>
-            <div class="movie-tile-info">
-              <h3>{{ similarMovie.name }}</h3>
-              <p v-if="similarMovie.year">{{ String(similarMovie.year).slice(0, 4) }}</p>
-              <span v-if="formatRating(similarMovie.average_rating)" class="movie-tile-rating">
-                <q-icon name="star" size="18px" aria-hidden="true" />
-                {{ formatRating(similarMovie.average_rating) }}
-                <span class="movie-tile-rating-scale">/ 10</span>
-              </span>
-              <span v-else class="movie-tile-unrated">Not yet rated</span>
-            </div>
-          </router-link>
+            :movie="similarMovie"
+          />
         </div>
         <p v-else class="detail-section-message">No similar movies are available yet.</p>
       </section>

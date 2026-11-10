@@ -1,9 +1,9 @@
 <script setup>
-import PersonForm from '../components/PersonForm.vue';
+import PersonDetails from '../components/PersonDetails.vue';
 </script>
 
 <template>
   <main>
-    <PersonForm />
+    <PersonDetails />
   </main>
 </template>

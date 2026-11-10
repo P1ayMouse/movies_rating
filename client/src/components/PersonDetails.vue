@@ -1,9 +1,12 @@
 <script>
-import { QBtn, QIcon, QImg, QSpinnerDots } from 'quasar';
+import { QBtn, QIcon, QSpinnerDots } from 'quasar';
+import MovieTile from './MovieTile.vue';
+import PosterImage from './PosterImage.vue';
+import { yearOf } from '../format.js';
 
 export default {
-  name: 'PersonForm',
-  components: { QBtn, QIcon, QImg, QSpinnerDots },
+  name: 'PersonDetails',
+  components: { MovieTile, PosterImage, QBtn, QIcon, QSpinnerDots },
   data() {
     return {
       loading: true,
@@ -18,10 +21,10 @@ export default {
   },
   computed: {
     birthYear() {
-      return this.person.birth_year ? String(this.person.birth_year).slice(0, 4) : '';
+      return yearOf(this.person.birth_year);
     },
     deathYear() {
-      return this.person.death_year ? String(this.person.death_year).slice(0, 4) : '';
+      return yearOf(this.person.death_year);
     }
   },
   mounted() {
@@ -88,13 +91,6 @@ export default {
       } finally {
         if (requestId === this.requestId) this.knownForLoading = false;
       }
-    },
-    formatRating(value) {
-      const rating = Number(value);
-      return Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : null;
-    },
-    imageUrl(value) {
-      return value && value !== 'None' ? value : undefined;
     }
   }
 };
@@ -154,24 +150,12 @@ export default {
         </div>
 
         <div class="detail-media">
-          <q-img
-            v-if="imageUrl(person.photo)"
-            :src="imageUrl(person.photo)"
+          <poster-image
+            :src="person.photo"
             :alt="`Photo of ${person.name}`"
-            :ratio="2 / 3"
-            class="detail-media-image"
-          >
-            <template #error>
-              <div class="detail-placeholder">
-                <q-icon name="person" size="36px" aria-hidden="true" />
-                <span>Photo unavailable</span>
-              </div>
-            </template>
-          </q-img>
-          <div v-else class="detail-placeholder">
-            <q-icon name="person" size="36px" aria-hidden="true" />
-            <span>Photo unavailable</span>
-          </div>
+            icon="person"
+            label="Photo unavailable"
+          />
         </div>
       </section>
 
@@ -185,40 +169,7 @@ export default {
           <q-btn flat no-caps label="Try again" @click="loadKnownFor()" />
         </div>
         <div v-else-if="knownFor.length" class="movie-tiles">
-          <router-link
-            v-for="movie in knownFor"
-            :key="movie.id"
-            :to="{ name: 'movie', params: { id: movie.id } }"
-            class="movie-tile"
-          >
-            <div class="movie-tile-poster">
-              <q-img
-                v-if="imageUrl(movie.poster)"
-                :src="imageUrl(movie.poster)"
-                alt=""
-                :ratio="2 / 3"
-              >
-                <template #error>
-                  <div class="detail-placeholder">
-                    <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
-                  </div>
-                </template>
-              </q-img>
-              <div v-else class="detail-placeholder">
-                <q-icon name="image_not_supported" size="24px" aria-hidden="true" />
-              </div>
-            </div>
-            <div class="movie-tile-info">
-              <h3>{{ movie.name }}</h3>
-              <p v-if="movie.year">{{ String(movie.year).slice(0, 4) }}</p>
-              <span v-if="formatRating(movie.average_rating)" class="movie-tile-rating">
-                <q-icon name="star" size="18px" aria-hidden="true" />
-                {{ formatRating(movie.average_rating) }}
-                <span class="movie-tile-rating-scale">/ 10</span>
-              </span>
-              <span v-else class="movie-tile-unrated">Not yet rated</span>
-            </div>
-          </router-link>
+          <movie-tile v-for="movie in knownFor" :key="movie.id" :movie="movie" />
         </div>
         <p v-else class="detail-section-message">
           None of {{ person.name }}'s best-known titles are in the catalog yet.
