@@ -1,29 +1,41 @@
 <script setup>
-import { ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import SiteSearch from './components/SiteSearch.vue';
 import UserBadge from './components/UserBadge.vue';
 
-const route = useRoute();
-const router = useRouter();
-const search = ref('');
+const searchBox = ref(null);
+// Shadow under the header once the page is scrolled
+const scrolled = ref(false);
 
-// Keep the current query in the box on search pages, clear it everywhere else
-watch(
-  () => route.params.search,
-  (value) => {
-    search.value = value || '';
-  },
-  { immediate: true }
-);
-
-function onMovieSearch() {
-  const query = search.value.trim();
-  if (query) router.push({ name: 'movies-search', params: { search: query } });
+function onScroll() {
+  scrolled.value = window.scrollY > 4;
 }
+
+// "/" anywhere on the page jumps to the search field
+function onKeydown(event) {
+  if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+  const target = event.target;
+  const typing =
+    target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+  if (typing) return;
+  event.preventDefault();
+  searchBox.value?.focus();
+}
+
+onMounted(() => {
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('keydown', onKeydown);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll);
+  window.removeEventListener('keydown', onKeydown);
+});
 </script>
 
 <template>
-  <header class="site-header text-font">
+  <header class="site-header text-font" :class="{ 'is-scrolled': scrolled }">
     <div class="site-header-inner">
       <router-link :to="{ name: 'movies' }" class="site-logo" aria-label="Diploma MDB home">
         <span class="site-logo-mark" aria-hidden="true">
@@ -32,18 +44,7 @@ function onMovieSearch() {
         <span>Diploma <span class="site-logo-accent">MDB</span></span>
       </router-link>
 
-      <form class="site-search" role="search" @submit.prevent="onMovieSearch">
-        <input
-          v-model="search"
-          type="search"
-          placeholder="Search movies"
-          aria-label="Search movies"
-          class="site-search-input"
-        />
-        <button type="submit" class="site-search-button" aria-label="Search">
-          <q-icon name="search" size="20px" />
-        </button>
-      </form>
+      <SiteSearch ref="searchBox" />
 
       <div class="site-user">
         <UserBadge />

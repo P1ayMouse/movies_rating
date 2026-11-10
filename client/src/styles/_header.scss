@@ -7,6 +7,11 @@
   border-bottom: 1px solid $border-color;
   background: rgba($header-bg, 0.92);
   backdrop-filter: saturate(180%) blur(12px);
+  transition: box-shadow 0.2s ease;
+
+  &.is-scrolled {
+    box-shadow: 0 4px 18px rgb(0 0 0 / 7%);
+  }
 
   a:focus-visible,
   button:focus-visible {
@@ -61,6 +66,7 @@
 
   // Search
   .site-search {
+    position: relative;
     grid-area: search;
     display: flex;
     align-items: center;
@@ -101,6 +107,11 @@
     &::placeholder {
       color: #888;
     }
+
+    // The browser's own clear button. There is a custom one next to the field
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
   }
 
   .site-search-button {
@@ -126,8 +137,98 @@
     }
   }
 
+  // Suggestions under the field
+  .site-search-list {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+    z-index: 10;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid $border-color;
+    border-radius: 14px;
+    background: $page-bg;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 14%);
+    list-style: none;
+  }
+
+  .site-search-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+
+    &.is-active {
+      background: $header-bg;
+
+      .site-search-option-title {
+        color: $accent-text;
+      }
+    }
+  }
+
+  .site-search-poster {
+    flex: 0 0 32px;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 4px;
+    background: $card-header-bg;
+
+    .poster-placeholder {
+      padding: 0;
+    }
+  }
+
+  .site-search-option-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .site-search-option-title {
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-search-option-meta {
+    color: $muted-text;
+    font-size: 12px;
+  }
+
+  .site-search-star {
+    color: #b7790b;
+  }
+
+  .site-search-all {
+    margin-top: 4px;
+    padding: 10px 8px;
+    border-top: 1px solid $border-color;
+    border-radius: 0 0 10px 10px;
+    color: $muted-text;
+    font-size: 14px;
+
+    &.is-active {
+      color: $text-color;
+    }
+  }
+
+  .site-search-message {
+    padding: 12px 8px;
+    color: $muted-text;
+    font-size: 14px;
+  }
+
   .site-user {
     grid-area: user;
+    display: flex;
+    align-items: center;
+    gap: 4px;
     justify-self: end;
   }
 
@@ -216,7 +317,7 @@
 
   // Not sticky here, so it doesn't take a big part of a small screen.
   @media (max-width: $header-mobile) {
-    position: static;
+    position: relative;
 
     .site-header-inner {
       grid-template-columns: minmax(0, 1fr) auto;
