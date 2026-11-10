@@ -69,7 +69,7 @@ The IMDb files take several gigabytes and the commands save rows one by one, so 
 | Variable | Purpose                                                                         |
 |----------|---------------------------------------------------------------------------------|
 | `DJANGO_SETTINGS_MODULE` | `settings.docker` for running locally in Docker, `settings.prod` for the server |
-| `DJANGO_SECRET_KEY` | Django secret key                                                               |
+| `DJANGO_SECRET_KEY` | Django secret key, also signs login tokens. Generate one with `openssl rand -hex 32`. Required: Django won't start without it |
 | `PY_AUTORELOAD` | `True`: uwsgi restarts when the code changes                                    |
 | `POSTGRES_DB`, `POSTGRES_PASSWORD` | Used by both the Postgres container and Django                                  |
 | `TMDB_API_TOKEN` | TMDB token for posters and photos                                               |
@@ -84,7 +84,7 @@ To send real emails, fill in `EMAIL_HOST`, `EMAIL_HOST_USER` and `EMAIL_HOST_PAS
 
 ## Development without Docker
 
-By default `manage.py` uses `settings.base`, which points to an in-memory SQLite database. It cannot run the `movies` migrations (`ArrayField` needs Postgres), and data would be lost on every restart anyway. To work from `.venv`, run only the database in Docker and tell Django how to reach it (use the `POSTGRES_PASSWORD` from your `.env`):
+By default `manage.py` uses `settings.base`, which points to an in-memory SQLite database. It cannot run the `movies` migrations (`ArrayField` needs Postgres), and data would be lost on every restart anyway. To work from `.venv`, run only the database in Docker and tell Django how to reach it (take `DJANGO_SECRET_KEY` and `POSTGRES_PASSWORD` from your `.env`):
 
 ```bash
 python3.10 -m venv .venv
@@ -92,7 +92,7 @@ source .venv/bin/activate
 pip install -r requirements-dev.txt
 
 docker compose up -d db redis
-export DJANGO_SETTINGS_MODULE=settings.docker POSTGRES_HOST=localhost POSTGRES_PORT=5433 POSTGRES_PASSWORD=<from .env>
+export DJANGO_SETTINGS_MODULE=settings.docker DJANGO_SECRET_KEY=<from .env> POSTGRES_HOST=localhost POSTGRES_PORT=5433 POSTGRES_PASSWORD=<from .env>
 python manage.py migrate
 python manage.py runserver
 ```

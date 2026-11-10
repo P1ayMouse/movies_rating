@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from apps.authentication.models import UserToken
+from apps.authentication.validators import check_passwords, check_username
 
 User = get_user_model()
 
@@ -23,27 +24,20 @@ class RegistrationUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
-    def create(self, validated_data):
+    # Checked before anything is saved, so a failed sign-up creates no user
+    def validate_username(self, value):
+        return check_username(value)
 
-        user = User.objects.create_user(
+    def validate(self, attrs):
+        check_passwords(attrs['password'], attrs['password2'])
+        return attrs
+
+    def create(self, validated_data):
+        return User.objects.create_user(
             email=validated_data['email'],
             username=validated_data['username'],
             password=validated_data['password']
         )
-
-        password = self.validated_data['password']
-        password2 = self.validated_data['password2']
-        if password2 != password:
-            raise serializers.ValidationError({'detail': 'Password mismatch'})
-        elif len(password) < 6:
-            raise serializers.ValidationError({'detail': 'Password is too small'})
-
-        username = self.validated_data['username']
-        if len(username) < 6:
-            raise serializers.ValidationError({'detail': 'Username is too small'})
-
-        user.save()
-        return user
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
@@ -56,18 +50,13 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         read_only_fields = ['email']
 
     def validate_username(self, value):
-        if len(value) < 6:
-            raise serializers.ValidationError('Username is too small')
-        return value
+        return check_username(value)
 
     def validate(self, attrs):
         password = attrs.get('password', '')
-
-        if password or attrs.get('password2'):
-            if password != attrs.get('password2'):
-                raise serializers.ValidationError({'detail': 'Password mismatch'})
-            if len(password) < 6:
-                raise serializers.ValidationError({'detail': 'Password is too small'})
+        password2 = attrs.get('password2', '')
+        if password or password2:
+            check_passwords(password, password2)
         return attrs
 
     def update(self, instance, validated_data):
@@ -108,10 +97,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     password2 = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({'detail': 'Password mismatch'})
-        if len(attrs['password']) < 6:
-            raise serializers.ValidationError({'detail': 'Password is too small'})
+        check_passwords(attrs['password'], attrs['password2'])
 
         oldest_valid = timezone.now() - settings.PASSWORD_RESET_LINK_LIFETIME
         user_token = UserToken.objects.select_related('user').filter(

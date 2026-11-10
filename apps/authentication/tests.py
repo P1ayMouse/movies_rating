@@ -7,6 +7,58 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.authentication.models import User, UserToken
+from apps.authentication.serializer import RegistrationUserSerializer
+
+
+class RegistrationTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse('authentication:registration-user')
+
+    def data(self, **changes):
+        return {
+            'email': 'new@example.com',
+            'username': 'newuser',
+            'password': 'secret1',
+            'password2': 'secret1',
+            **changes,
+        }
+
+    def register(self, **changes):
+        return self.client.post(self.url, self.data(**changes), format='json')
+
+    def test_creates_user_that_can_log_in(self):
+        response = self.register()
+
+        self.assertEqual(response.status_code, 201)
+        self.assertNotIn('password', response.data)
+        user = User.objects.get(email='new@example.com')
+        self.assertEqual(user.username, 'newuser')
+        self.assertTrue(user.check_password('secret1'))
+
+    def test_bad_data_is_rejected_before_saving(self):
+        cases = {
+            'Password mismatch': {'password2': 'secret2'},
+            'Password is too small': {'password': '123', 'password2': '123'},
+            'Username is too small': {'username': 'abc'},
+        }
+        for message, changes in cases.items():
+            with self.subTest(message):
+                # The serializer itself must refuse, not fail later while saving
+                self.assertFalse(RegistrationUserSerializer(data=self.data(**changes)).is_valid())
+
+                response = self.register(**changes)
+                self.assertEqual(response.status_code, 400)
+                self.assertIn(message, str(response.data))
+                self.assertFalse(User.objects.filter(email='new@example.com').exists())
+
+    def test_email_must_be_unique(self):
+        self.register()
+        response = self.register(username='otheruser')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('email', response.data)
+        self.assertEqual(User.objects.filter(email='new@example.com').count(), 1)
 
 
 class PasswordResetTest(TestCase):
