@@ -1,35 +1,28 @@
-# movies_rating
+# PopRank frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue 3 + Quasar app built with Vite. How to run the whole project (API, database, nginx) is in the [main README](../README.md).
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+## Commands
 
 ```sh
 npm install
+npm run dev      # dev server on port 3000
+npm run build    # production build into dist/
+npm run lint     # ESLint, fixes what it can
+npm run format   # Prettier for src/
 ```
 
-### Compile and Hot-Reload for Development
+## Where things are
 
-```sh
-npm run dev
 ```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+src/
+  views/        pages the router opens
+  components/   page content and shared pieces (MovieTile, PosterImage, PasswordInput…)
+  styles/       all SCSS, one file per page or part, joined in main.scss
+  assets/       images used from CSS (popcorn.svg)
+  auth.js       tokens, current user, logIn()
+  brand.js      site name, page titles, logo icon
+  format.js     ratings, years, vote counts
+  reveal.js     v-reveal: fade in on scroll (Motion)
+public/         favicons
 ```
