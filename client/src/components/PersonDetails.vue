@@ -1,4 +1,5 @@
 <script>
+import { pageTitle } from '../brand.js';
 import { QBtn, QIcon, QSpinnerDots } from 'quasar';
 import MovieTile from './MovieTile.vue';
 import PosterImage from './PosterImage.vue';
@@ -46,7 +47,7 @@ export default {
       this.personNotFound = false;
       this.knownFor = [];
       this.knownForError = false;
-      document.title = 'Person | Diploma MDB';
+      document.title = pageTitle('Person');
 
       try {
         const response = await fetch(`/api/v1/movies/persons/${this.$route.params.id}/`);
@@ -59,7 +60,7 @@ export default {
         const person = await response.json();
         if (requestId !== this.requestId) return;
         this.person = person;
-        document.title = `${person.name} | Diploma MDB`;
+        document.title = pageTitle(person.name);
         this.loading = false;
 
         await this.loadKnownFor(requestId);

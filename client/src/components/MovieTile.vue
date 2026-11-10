@@ -17,7 +17,7 @@ defineProps({
       <h3>{{ movie.name }}</h3>
       <p v-if="movie.year">{{ yearOf(movie.year) }}</p>
       <span v-if="formatRating(movie.average_rating)" class="movie-tile-rating">
-        <q-icon name="star" size="18px" aria-hidden="true" />
+        <q-icon class="popcorn-icon" size="18px" aria-hidden="true" />
         {{ formatRating(movie.average_rating) }}
         <span class="movie-tile-rating-scale">/ 10</span>
       </span>

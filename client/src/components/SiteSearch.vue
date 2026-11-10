@@ -190,7 +190,7 @@ defineExpose({ focus });
           <span class="site-search-option-meta">
             {{ yearOf(movie.year) }}
             <template v-if="formatRating(movie.average_rating)">
-              · <q-icon name="star" size="13px" class="site-search-star" />
+              · <q-icon class="popcorn-icon site-search-star" size="13px" />
               {{ formatRating(movie.average_rating) }}
             </template>
           </span>

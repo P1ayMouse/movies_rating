@@ -1,6 +1,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import SiteSearch from './components/SiteSearch.vue';
+import { APP_NAME, LOGO_ICON } from './brand.js';
 import UserBadge from './components/UserBadge.vue';
 
 const searchBox = ref(null);
@@ -37,11 +38,11 @@ onBeforeUnmount(() => {
 <template>
   <header class="site-header text-font" :class="{ 'is-scrolled': scrolled }">
     <div class="site-header-inner">
-      <router-link :to="{ name: 'movies' }" class="site-logo" aria-label="Diploma MDB home">
+      <router-link :to="{ name: 'movies' }" class="site-logo" :aria-label="`${APP_NAME} home`">
         <span class="site-logo-mark" aria-hidden="true">
-          <q-icon name="movie" size="20px" />
+          <q-icon :name="LOGO_ICON" size="20px" />
         </span>
-        <span>Diploma <span class="site-logo-accent">MDB</span></span>
+        <span>Pop<span class="site-logo-accent">Rank</span></span>
       </router-link>
 
       <SiteSearch ref="searchBox" />

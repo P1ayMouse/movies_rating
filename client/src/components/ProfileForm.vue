@@ -1,5 +1,6 @@
 <script>
 import { useQuasar } from 'quasar';
+import { pageTitle } from '../brand.js';
 import { authFetch, authState } from '@/auth';
 import { errorMessage } from '@/errors';
 
@@ -28,7 +29,7 @@ export default {
 
     if (response.status === 200) {
       this.user = await response.json();
-      document.title = 'Profile of ' + (this.user.username || this.user.email);
+      document.title = pageTitle(`Profile of ${this.user.username || this.user.email}`);
       this.userLoaded = true;
     } else if (response.status === 403) {
       // the session could not be renewed, so log in again
@@ -60,7 +61,7 @@ export default {
       if (response.status === 200) {
         this.user = await response.json();
         authState.user = { ...this.user };
-        document.title = 'Profile of ' + (this.user.username || this.user.email);
+        document.title = pageTitle(`Profile of ${this.user.username || this.user.email}`);
         this.$q.notify({
           message: 'Profile updated',
           color: 'positive',

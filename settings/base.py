@@ -141,6 +141,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+SITE_NAME = 'PopRank'
 SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
 
 # Send emails via SMTP if EMAIL_HOST is set, otherwise print them to the console
@@ -153,7 +154,7 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Diploma MDB <noreply@localhost>')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f'{SITE_NAME} <noreply@localhost>')
 
 PASSWORD_RESET_LINK_LIFETIME = timedelta(hours=1)
 

@@ -9,3 +9,8 @@ body {
   font-family: $font-family;
   text-decoration: none;
 }
+
+.popcorn-icon {
+  background-color: currentColor;
+  mask: url('@/assets/popcorn.svg') center / contain no-repeat;
+}

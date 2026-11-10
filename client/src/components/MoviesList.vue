@@ -1,4 +1,5 @@
 <script>
+import { pageTitle } from '../brand.js';
 import { QBtn, QIcon, QSpinnerDots } from 'quasar';
 import MoviePagination from './MoviePagination.vue';
 import PosterImage from './PosterImage.vue';
@@ -57,7 +58,7 @@ export default {
       const requestId = ++this.requestId;
       this.loading = true;
       this.errorMessage = '';
-      document.title = this.search ? `${this.search} | Diploma MDB` : 'Diploma MDB';
+      document.title = pageTitle(this.search);
 
       const params = new URLSearchParams({
         limit: this.limit,
@@ -140,7 +141,7 @@ export default {
                 class="movie-card-rating"
                 :aria-label="`Rating ${formatRating(movie.average_rating)} out of 10`"
               >
-                <q-icon name="star" size="16px" aria-hidden="true" />
+                <q-icon class="popcorn-icon" size="16px" aria-hidden="true" />
                 {{ formatRating(movie.average_rating) }}
               </span>
 
@@ -148,7 +149,7 @@ export default {
               <div class="movie-card-details" aria-hidden="true">
                 <p class="movie-card-details-rating">
                   <template v-if="formatRating(movie.average_rating)">
-                    <q-icon name="star" size="20px" />
+                    <q-icon class="popcorn-icon" size="20px" />
                     {{ formatRating(movie.average_rating) }}
                     <span>/ 10</span>
                   </template>

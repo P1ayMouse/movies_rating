@@ -1,4 +1,5 @@
 <script setup>
+import { pageTitle } from '../brand.js';
 import ResetPasswordForm from '../components/ResetPasswordForm.vue';
 
 defineProps({
@@ -8,7 +9,7 @@ defineProps({
   }
 });
 
-document.title = 'New password';
+document.title = pageTitle('New password');
 </script>
 
 <template>

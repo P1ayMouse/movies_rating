@@ -1,4 +1,5 @@
 <script>
+import { pageTitle } from '../brand.js';
 import { QBtn, QIcon, QSpinnerDots, QTable, QTd } from 'quasar';
 import MovieTile from './MovieTile.vue';
 import PersonHoverCard from './PersonHoverCard.vue';
@@ -7,7 +8,16 @@ import { creditRole, formatJob, formatRating, yearOf } from '../format.js';
 
 export default {
   name: 'MovieDetails',
-  components: { MovieTile, PersonHoverCard, PosterImage, QBtn, QIcon, QSpinnerDots, QTable, QTd },
+  components: {
+    MovieTile,
+    PersonHoverCard,
+    PosterImage,
+    QBtn,
+    QIcon,
+    QSpinnerDots,
+    QTable,
+    QTd
+  },
   data() {
     return {
       loading: true,
@@ -78,7 +88,7 @@ export default {
       this.similarMovies = [];
       this.peopleError = false;
       this.similarError = false;
-      document.title = 'Movie details | Diploma MDB';
+      document.title = pageTitle('Movie details');
 
       try {
         const response = await fetch(`/api/v1/movies/${this.$route.params.id}/`);
@@ -91,7 +101,9 @@ export default {
         const movie = await response.json();
         if (requestId !== this.requestId) return;
         this.movie = movie;
-        document.title = `${movie.name}${this.releaseYear ? ` (${this.releaseYear})` : ''} | Diploma MDB`;
+        document.title = pageTitle(
+          this.releaseYear ? `${movie.name} (${this.releaseYear})` : movie.name
+        );
         this.loading = false;
 
         await Promise.all([this.loadPeople(requestId), this.loadSimilarMovies(requestId)]);
@@ -187,7 +199,7 @@ export default {
             <div class="movie-score">
               <p class="movie-score-label">Rating</p>
               <div v-if="formatRating(movie.average_rating)" class="movie-score-value">
-                <q-icon name="star" aria-hidden="true" />
+                <q-icon class="popcorn-icon" aria-hidden="true" />
                 <span class="movie-score-number">{{ formatRating(movie.average_rating) }}</span>
                 <span class="movie-score-scale">/ 10</span>
               </div>
