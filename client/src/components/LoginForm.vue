@@ -1,112 +1,85 @@
 <script>
-import { useQuasar } from 'quasar';
-import { loadCurrentUser, saveTokens } from '@/auth';
+import { QBtn, QIcon, QInput } from 'quasar';
+import PasswordInput from './PasswordInput.vue';
+import { APP_NAME } from '../brand.js';
+import { logIn, nextPath } from '@/auth';
 
 export default {
   name: 'LoginForm',
+  components: { PasswordInput, QBtn, QIcon, QInput },
   data() {
     return {
-      user: {},
-      formError: null
+      appName: APP_NAME,
+      email: '',
+      password: '',
+      loading: false,
+      formError: ''
     };
   },
-  setup() {
-    const $q = useQuasar();
-    return { $q };
-  },
   methods: {
-    async onUserLogin(e) {
-      e.preventDefault();
-      this.formError = null;
-      const response = await fetch('/api/v1/auth/token/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.user)
-      });
-
-      if (response.status !== 200) {
-        try {
-          this.formError = (await response.json()).detail;
-        } catch {
-          this.formError = 'Unknown error';
-        }
-        this.errorNotify();
-      } else {
-        saveTokens(await response.json());
-        await loadCurrentUser();
-        this.$router.push('/profile');
+    async onLogin() {
+      this.formError = '';
+      if (!this.email.trim() || !this.password) {
+        this.formError = 'Enter your email and password.';
+        return;
       }
-    },
-    errorNotify() {
-      this.$q.notify({
-        message: this.formError,
-        color: 'negative',
-        position: 'top',
-        textColor: 'white',
-        actions: [{ icon: 'close', color: 'white' }],
-        html: true,
-        timeout: 2000
-      });
-    },
-    goToRegister() {
-      this.$router.push('/register/');
-    },
-    goToPasswordForgot() {
-      this.$router.push('/password-forgot/');
+
+      this.loading = true;
+      try {
+        this.formError = await logIn(this.email.trim(), this.password);
+        if (!this.formError) this.$router.push(nextPath(this.$route));
+      } catch {
+        this.formError = 'Network error. Please try again.';
+      } finally {
+        this.loading = false;
+      }
     }
   }
 };
 </script>
 
 <template>
-  <div class="auth-form text-font">
-    <div class="row justify-center items-center">
-      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
-        <q-card-section class="text-h5 text-center q-mb-md"> Login </q-card-section>
-        <q-form @submit="onUserLogin" class="q-gutter-md">
-          <q-input
-            outlined
-            v-model="user.email"
-            placeholder="Input your email"
-            type="email"
-            label="e-mail"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.password"
-            placeholder="Input your password"
-            type="password"
-            label="password"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <div class="text-center">
-            <q-btn
-              label="Log In"
-              outline
-              type="submit"
-              color="grey"
-              class="form-button q-mb-md"
-            ></q-btn>
-          </div>
-          <div class="row justify-between">
-            <q-btn
-              flat
-              color="primary"
-              no-caps
-              label="Forgot password"
-              @click="goToPasswordForgot"
-            />
-            <q-btn flat color="primary" no-caps label="Register" @click="goToRegister" />
-          </div>
-        </q-form>
-      </q-card>
+  <div class="auth-page">
+    <div class="auth-card">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-subtitle">Log in to {{ appName }} to rate movies and manage your account.</p>
+
+      <form class="auth-fields" novalidate @submit.prevent="onLogin">
+        <q-input
+          v-model="email"
+          outlined
+          type="email"
+          label="Email"
+          autocomplete="email"
+          autofocus
+        />
+
+        <div>
+          <password-input v-model="password" />
+          <router-link :to="{ name: 'password-forgot' }" class="auth-forgot">
+            Forgot password?
+          </router-link>
+        </div>
+
+        <p v-if="formError" class="auth-error" role="alert">
+          <q-icon name="error_outline" size="18px" aria-hidden="true" />
+          {{ formError }}
+        </p>
+
+        <q-btn
+          type="submit"
+          unelevated
+          no-caps
+          label="Log in"
+          class="auth-submit"
+          :loading="loading"
+        />
+      </form>
+
+      <p class="auth-footer">
+        New to {{ appName }}?
+        <router-link :to="{ name: 'register', query: $route.query }">Create an account</router-link>
+      </p>
     </div>
   </div>
 </template>

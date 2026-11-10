@@ -251,12 +251,20 @@
     background: $card-header-bg;
   }
 
+  // Account button
   .user-badge-button {
     min-height: 42px;
     padding: 4px 8px 4px 4px;
+    border: 1px solid $border-color;
     border-radius: 999px;
+    background: $page-bg;
     color: $text-color;
     font-size: 15px;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: #bbb;
+    }
 
     .q-btn__content {
       flex-wrap: nowrap;
@@ -274,45 +282,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .user-badge-guest {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .user-badge-signup,
-  .user-badge-login {
-    display: inline-flex;
-    align-items: center;
-    min-height: 38px;
-    padding: 0 16px;
-    border-radius: 999px;
-    font-size: 15px;
-    text-decoration: none;
-    white-space: nowrap;
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
-  }
-
-  .user-badge-signup {
-    color: $muted-text;
-
-    &:hover {
-      background: $header-bg;
-      color: $text-color;
-    }
-  }
-
-  .user-badge-login {
-    background: $text-color;
-    color: white;
-
-    &:hover {
-      background: #000;
-    }
   }
 
   // Not sticky here, so it doesn't take a big part of a small screen.
@@ -337,10 +306,6 @@
     }
 
     .user-badge-name {
-      display: none;
-    }
-
-    .user-badge-signup {
       display: none;
     }
   }

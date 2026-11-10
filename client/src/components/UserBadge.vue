@@ -1,5 +1,5 @@
 <script>
-import { authState, clearTokens, loadCurrentUser } from '@/auth';
+import { authState, clearTokens, ensureUserLoaded, loadCurrentUser } from '@/auth';
 
 export default {
   name: 'UserBadge',
@@ -16,12 +16,19 @@ export default {
     displayName() {
       return this.user.username || this.user.email;
     },
+    onAuthPage() {
+      return ['login', 'register', 'password-forgot', 'password-reset'].includes(this.$route.name);
+    },
+    // After logging in or signing up, return to this page
+    returnQuery() {
+      return { next: this.$route.fullPath };
+    },
     initial() {
       return (this.displayName || '?').charAt(0).toUpperCase();
     }
   },
   mounted() {
-    loadCurrentUser();
+    ensureUserLoaded();
   },
   methods: {
     doLogOut() {
@@ -87,8 +94,40 @@ export default {
     <q-tooltip>{{ loadError }}</q-tooltip>
   </q-btn>
 
-  <div v-else class="user-badge-guest">
-    <router-link :to="{ name: 'register' }" class="user-badge-signup">Sign up</router-link>
-    <router-link :to="{ name: 'login' }" class="user-badge-login">Log in</router-link>
-  </div>
+  <!-- Guest: same menu button as for a logged-in user, with a person icon instead of a letter -->
+  <q-btn-dropdown
+    v-else-if="!onAuthPage"
+    flat
+    no-caps
+    class="user-badge-button"
+    dropdown-icon="expand_more"
+    content-class="user-badge-menu"
+    :menu-offset="[0, 8]"
+    menu-anchor="bottom right"
+    menu-self="top right"
+    auto-close
+    aria-label="Account"
+  >
+    <template #label>
+      <span class="user-badge-avatar" aria-hidden="true">
+        <q-icon name="person" size="20px" />
+      </span>
+      <span class="user-badge-name">Log in</span>
+    </template>
+
+    <q-list>
+      <q-item :to="{ name: 'login', query: returnQuery }" clickable>
+        <q-item-section avatar>
+          <q-icon name="login" size="20px" />
+        </q-item-section>
+        <q-item-section>Log in</q-item-section>
+      </q-item>
+      <q-item :to="{ name: 'register', query: returnQuery }" clickable>
+        <q-item-section avatar>
+          <q-icon name="person_add_alt" size="20px" />
+        </q-item-section>
+        <q-item-section>Create account</q-item-section>
+      </q-item>
+    </q-list>
+  </q-btn-dropdown>
 </template>

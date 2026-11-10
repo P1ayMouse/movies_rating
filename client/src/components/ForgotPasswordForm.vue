@@ -1,107 +1,107 @@
 <script>
-import { useQuasar } from 'quasar';
+import { QBtn, QIcon, QInput } from 'quasar';
 import { errorMessage } from '@/errors';
 
 export default {
   name: 'ForgotPasswordForm',
-
+  components: { QBtn, QIcon, QInput },
   data() {
     return {
-      user: {},
-      formError: null,
-      sending: false
+      email: '',
+      loading: false,
+      formError: '',
+      sentTo: ''
     };
   },
-  setup() {
-    const $q = useQuasar();
-    return { $q };
-  },
   methods: {
-    async onUserForgotPassword(e) {
-      e.preventDefault();
-      this.formError = null;
-      this.sending = true;
+    async onSend() {
+      this.formError = '';
+      const email = this.email.trim();
+      if (!email.includes('@')) {
+        this.formError = 'Enter the email you signed up with.';
+        return;
+      }
+
+      this.loading = true;
       try {
         const response = await fetch('/api/v1/auth/password-reset/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: this.user.email })
+          body: JSON.stringify({ email })
         });
-        if (response.status === 200) {
-          this.positiveNotify((await response.json()).detail);
-          this.user = {};
-        } else {
-          this.formError = await errorMessage(response);
-          this.errorNotify();
-        }
+        if (response.ok) this.sentTo = email;
+        else this.formError = await errorMessage(response);
       } catch {
-        this.formError = 'Network error';
-        this.errorNotify();
+        this.formError = 'Network error. Please try again.';
       } finally {
-        this.sending = false;
+        this.loading = false;
       }
     },
-    positiveNotify(message) {
-      this.$q.notify({
-        message,
-        color: 'positive',
-        position: 'top',
-        textColor: 'white',
-        actions: [{ icon: 'close', color: 'white' }],
-        timeout: 5000
-      });
-    },
-    errorNotify() {
-      this.$q.notify({
-        message: this.formError,
-        color: 'negative',
-        position: 'top',
-        textColor: 'white',
-        actions: [{ icon: 'close', color: 'white' }],
-        timeout: 2000
-      });
-    },
-    goToLogin() {
-      this.$router.push('/login/');
-    },
-    goToRegister() {
-      this.$router.push('/register/');
+    tryAgain() {
+      this.sentTo = '';
+      this.formError = '';
     }
   }
 };
 </script>
+
 <template>
-  <div class="auth-form text-font">
-    <div class="row justify-center items-center">
-      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
-        <q-card-section class="text-h5 text-center q-mb-md"> Forgot Password </q-card-section>
-        <q-form @submit="onUserForgotPassword" class="q-gutter-md">
-          <q-input
-            outlined
-            v-model="user.email"
-            placeholder="Input your email"
-            type="email"
-            label="e-mail"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <div class="text-center">
-            <q-btn
-              label="Send password reset"
-              outline
-              type="submit"
-              :loading="sending"
-              color="grey"
-              class="form-button q-mb-md"
-            ></q-btn>
-          </div>
-          <div class="row justify-between">
-            <q-btn flat color="primary" no-caps label="Login" @click="goToLogin" />
-            <q-btn flat color="primary" no-caps label="Register" @click="goToRegister" />
-          </div>
-        </q-form>
-      </q-card>
+  <div class="auth-page">
+    <div v-if="sentTo" class="auth-card" role="status">
+      <span class="auth-state-icon" aria-hidden="true">
+        <q-icon name="mark_email_read" size="28px" />
+      </span>
+      <h1 class="auth-title">Check your email</h1>
+      <p class="auth-subtitle">
+        If an account exists for <strong>{{ sentTo }}</strong
+        >, we sent it a link to set a new password.
+      </p>
+      <q-btn
+        unelevated
+        no-caps
+        label="Back to log in"
+        class="auth-submit auth-submit--block"
+        :to="{ name: 'login' }"
+      />
+      <p class="auth-footer">
+        No email?
+        <a href="#" @click.prevent="tryAgain">Try a different address</a>
+      </p>
+    </div>
+
+    <div v-else class="auth-card">
+      <h1 class="auth-title">Forgot your password?</h1>
+      <p class="auth-subtitle">Enter your email and we'll send you a link to set a new one.</p>
+
+      <form class="auth-fields" novalidate @submit.prevent="onSend">
+        <q-input
+          v-model="email"
+          outlined
+          type="email"
+          label="Email"
+          autocomplete="email"
+          autofocus
+        />
+
+        <p v-if="formError" class="auth-error" role="alert">
+          <q-icon name="error_outline" size="18px" aria-hidden="true" />
+          {{ formError }}
+        </p>
+
+        <q-btn
+          type="submit"
+          unelevated
+          no-caps
+          label="Send link"
+          class="auth-submit"
+          :loading="loading"
+        />
+      </form>
+
+      <p class="auth-footer">
+        Remembered it?
+        <router-link :to="{ name: 'login' }">Log in</router-link>
+      </p>
     </div>
   </div>
 </template>

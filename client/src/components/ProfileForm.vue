@@ -1,5 +1,6 @@
 <script>
 import { QBtn, QIcon, QInput, QSpinnerDots, useQuasar } from 'quasar';
+import PasswordInput from './PasswordInput.vue';
 import { pageTitle } from '../brand.js';
 import { authFetch, authState, clearTokens } from '@/auth';
 import { errorMessage } from '@/errors';
@@ -8,7 +9,7 @@ const MIN_LENGTH = 6;
 
 export default {
   name: 'ProfileForm',
-  components: { QBtn, QIcon, QInput, QSpinnerDots },
+  components: { PasswordInput, QBtn, QIcon, QInput, QSpinnerDots },
   setup() {
     return { $q: useQuasar() };
   },
@@ -24,7 +25,6 @@ export default {
       // Password form
       password: '',
       password2: '',
-      showPassword: false,
       savingPassword: false,
       passwordError: ''
     };
@@ -54,7 +54,7 @@ export default {
         const response = await authFetch('/api/v1/auth/user-info/');
         if (response.status === 403) {
           // The session could not be renewed, so log in again
-          this.$router.push({ name: 'login' });
+          this.$router.push({ name: 'login', query: { next: '/profile/' } });
           return;
         }
         if (!response.ok) throw new Error(`Server error ${response.status}`);
@@ -83,7 +83,7 @@ export default {
         return 'Network error. Please try again.';
       }
       if (response.status === 403) {
-        this.$router.push({ name: 'login' });
+        this.$router.push({ name: 'login', query: { next: '/profile/' } });
         return '';
       }
       if (!response.ok) return errorMessage(response);
@@ -124,7 +124,6 @@ export default {
       if (!this.passwordError) {
         this.password = '';
         this.password2 = '';
-        this.showPassword = false;
         this.notifySaved('Password changed');
       }
     },
@@ -228,30 +227,10 @@ export default {
             readonly
           />
 
-          <q-input
-            v-model="password"
-            outlined
-            label="New password"
-            :type="showPassword ? 'text' : 'password'"
-            autocomplete="new-password"
-          >
-            <template #append>
-              <q-btn
-                flat
-                round
-                dense
-                :icon="showPassword ? 'visibility_off' : 'visibility'"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                @click="showPassword = !showPassword"
-              />
-            </template>
-          </q-input>
-
-          <q-input
+          <password-input v-model="password" label="New password" autocomplete="new-password" />
+          <password-input
             v-model="password2"
-            outlined
             label="Repeat new password"
-            :type="showPassword ? 'text' : 'password'"
             autocomplete="new-password"
           />
 

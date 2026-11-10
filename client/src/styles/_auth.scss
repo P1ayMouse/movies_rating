@@ -1,0 +1,134 @@
+@use 'variables' as *;
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding: 56px 16px 64px;
+
+  .auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 36px 32px 28px;
+    border: 1px solid $border-color;
+    border-radius: 20px;
+    background: $page-bg;
+    box-shadow: 0 12px 40px rgb(0 0 0 / 6%);
+    text-align: center;
+  }
+
+  .auth-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .auth-subtitle {
+    margin: 8px 0 28px;
+    color: $muted-text;
+    font-size: 14px;
+  }
+
+  .auth-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+
+    .q-field--outlined .q-field__control {
+      border-radius: 10px;
+    }
+  }
+
+  // Icon above the title on the "check your email" screen
+  .auth-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+    border-radius: 50%;
+    background: rgba($accent-text, 0.1);
+    color: $accent-text;
+  }
+
+  .auth-subtitle strong {
+    color: $text-color;
+    overflow-wrap: anywhere;
+  }
+
+  .auth-submit--block {
+    width: 100%;
+  }
+
+  .auth-forgot {
+    display: block;
+    width: fit-content;
+    margin: 8px 0 0 auto;
+    color: $muted-text;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $accent-text;
+    }
+  }
+
+  .auth-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fdecea;
+    color: #b42318;
+    font-size: 14px;
+  }
+
+  .auth-submit {
+    min-height: 46px;
+    border-radius: 999px;
+    background: $text-color;
+    color: white;
+    font-size: 15px;
+  }
+
+  .auth-footer {
+    margin: 24px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid $border-color;
+    color: $muted-text;
+    font-size: 14px;
+
+    a {
+      color: $accent-text;
+      font-weight: 700;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+    }
+  }
+
+  a:focus-visible {
+    outline: 2px solid $text-color;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 24px 16px 40px;
+
+    .auth-card {
+      padding: 28px 20px 22px;
+      border: 0;
+      box-shadow: none;
+    }
+  }
+}
