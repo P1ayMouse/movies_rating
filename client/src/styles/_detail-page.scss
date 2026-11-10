@@ -21,10 +21,18 @@
     margin-bottom: 16px;
     color: $muted-text;
     text-decoration: none;
+    transition: color 0.2s ease;
+
+    .q-icon {
+      transition: transform 0.2s ease;
+    }
 
     &:hover {
       color: $text-color;
-      text-decoration: underline;
+
+      .q-icon {
+        transform: translateX(-4px);
+      }
     }
   }
 
@@ -158,14 +166,21 @@
     border-radius: $radius;
     color: $text-color;
     text-decoration: none;
-    transition: border-color 0.15s;
+    background: $page-bg;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
 
-    &:hover {
-      border-color: $muted-text;
+    // Same feel as the cards on the movie list
+    &:hover,
+    &:focus-visible {
+      border-color: transparent;
+      box-shadow: 0 10px 24px rgb(0 0 0 / 12%);
+      transform: translateY(-3px);
 
       h3 {
-        text-decoration: underline;
-        text-underline-offset: 3px;
+        color: $accent-text;
       }
     }
   }
@@ -188,6 +203,7 @@
       font-weight: 700;
       line-height: 1.4;
       overflow-wrap: anywhere;
+      transition: color 0.2s ease;
     }
 
     p {
@@ -227,6 +243,17 @@
     p {
       margin-top: 12px;
       color: $muted-text;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .movie-tile {
+      transition: none;
+    }
+
+    .movie-tile:hover,
+    .movie-tile:focus-visible {
+      transform: none;
     }
   }
 

@@ -1,12 +1,13 @@
 <script>
 import { QBtn, QIcon, QSpinnerDots, QTable, QTd } from 'quasar';
 import MovieTile from './MovieTile.vue';
+import PersonHoverCard from './PersonHoverCard.vue';
 import PosterImage from './PosterImage.vue';
-import { formatRating, yearOf } from '../format.js';
+import { creditRole, formatJob, formatRating, yearOf } from '../format.js';
 
 export default {
   name: 'MovieDetails',
-  components: { MovieTile, PosterImage, QBtn, QIcon, QSpinnerDots, QTable, QTd },
+  components: { MovieTile, PersonHoverCard, PosterImage, QBtn, QIcon, QSpinnerDots, QTable, QTd },
   data() {
     return {
       loading: true,
@@ -20,6 +21,8 @@ export default {
       similarLoading: false,
       similarError: false,
       requestId: 0,
+      // Person cards on hover only make sense with a mouse, not on touch screens
+      canHover: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
       columns: [
         {
           name: 'name',
@@ -33,7 +36,7 @@ export default {
           label: 'Contribution',
           align: 'left',
           field: 'category',
-          format: (value) => this.formatJob(value),
+          format: formatJob,
           sortable: true
         },
         {
@@ -144,12 +147,7 @@ export default {
         if (requestId === this.requestId) this.similarLoading = false;
       }
     },
-    formatJob(job) {
-      return (job || '')
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-    },
+    creditRole,
     formatRating
   }
 };
@@ -262,6 +260,12 @@ export default {
                 class="movie-person-link"
               >
                 {{ props.row.person_id.name }}
+                <person-hover-card
+                  v-if="canHover"
+                  :person="props.row.person_id"
+                  :role="creditRole(props.row)"
+                  :movie-id="movie.id"
+                />
               </router-link>
             </q-td>
           </template>

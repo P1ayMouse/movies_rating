@@ -49,10 +49,7 @@
 
   .movies-list-clear {
     text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
+    transition: color 0.2s ease;
   }
 
   // Loading, error and empty states
@@ -112,10 +109,6 @@
         }
       }
 
-      .q-img__image {
-        transform: scale(1.06);
-      }
-
       .movie-card-rating {
         opacity: 0;
       }
@@ -157,10 +150,6 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
-    }
-
-    .q-img__image {
-      transition: transform 0.4s ease;
     }
   }
 
@@ -388,7 +377,6 @@
   // No movement for people who turned off animations in their system
   @media (prefers-reduced-motion: reduce) {
     .movie-card-poster,
-    .movie-card-poster .q-img__image,
     .movie-card-details {
       transition: none;
     }
@@ -396,7 +384,6 @@
     .movie-card:hover,
     .movie-card:focus-visible {
       .movie-card-poster,
-      .q-img__image,
       .movie-card-details {
         transform: none;
       }
