@@ -8,6 +8,7 @@ import MoviesListView from '../views/MoviesListView.vue';
 import ProfileView from '../views/ProfileView.vue';
 import MovieView from '../views/MovieView.vue';
 import PersonView from '../views/PersonView.vue';
+import NotFoundView from '../views/NotFoundView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -66,6 +67,12 @@ const router = createRouter({
       name: 'person',
       component: PersonView,
       props: true
+    },
+    {
+      // Any other address
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: NotFoundView
     }
   ]
 });
