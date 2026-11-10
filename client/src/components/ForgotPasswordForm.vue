@@ -47,7 +47,7 @@ export default {
 
 <template>
   <div class="auth-page">
-    <div v-if="sentTo" class="auth-card" role="status">
+    <div v-if="sentTo" v-reveal class="auth-card" role="status">
       <span class="auth-state-icon" aria-hidden="true">
         <q-icon name="mark_email_read" size="28px" />
       </span>
@@ -69,7 +69,7 @@ export default {
       </p>
     </div>
 
-    <div v-else class="auth-card">
+    <div v-else v-reveal class="auth-card">
       <h1 class="auth-title">Forgot your password?</h1>
       <p class="auth-subtitle">Enter your email and we'll send you a link to set a new one.</p>
 

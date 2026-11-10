@@ -131,7 +131,7 @@ export default {
       </div>
 
       <ul class="movies-grid" :class="{ 'is-loading': loading }" :aria-busy="loading">
-        <li v-for="movie in movies" :key="movie.id">
+        <li v-for="(movie, index) in movies" :key="movie.id" v-reveal="index">
           <router-link :to="{ name: 'movie', params: { id: movie.id } }" class="movie-card">
             <div class="movie-card-poster">
               <poster-image :src="movie.poster" icon-size="32px" label="No poster" />

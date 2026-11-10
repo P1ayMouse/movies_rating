@@ -116,7 +116,7 @@ export default {
     </div>
 
     <template v-else>
-      <section class="detail-overview" aria-labelledby="person-name">
+      <section v-reveal class="detail-overview" aria-labelledby="person-name">
         <div class="detail-summary">
           <div class="detail-heading">
             <h1 id="person-name" class="detail-title">{{ person.name }}</h1>
@@ -160,7 +160,7 @@ export default {
         </div>
       </section>
 
-      <section class="detail-section" aria-labelledby="known-for-title">
+      <section v-reveal class="detail-section" aria-labelledby="known-for-title">
         <h2 id="known-for-title">Known for</h2>
         <p class="detail-section-description">Best-known titles that are in this catalog.</p>
 
@@ -170,7 +170,12 @@ export default {
           <q-btn flat no-caps label="Try again" @click="loadKnownFor()" />
         </div>
         <div v-else-if="knownFor.length" class="movie-tiles">
-          <movie-tile v-for="movie in knownFor" :key="movie.id" :movie="movie" />
+          <movie-tile
+            v-for="(movie, index) in knownFor"
+            :key="movie.id"
+            v-reveal="index"
+            :movie="movie"
+          />
         </div>
         <p v-else class="detail-section-message">
           None of {{ person.name }}'s best-known titles are in the catalog yet.

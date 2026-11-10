@@ -19,7 +19,7 @@ const visible = ref(false);
     :label="label"
     :type="visible ? 'text' : 'password'"
     :autocomplete="autocomplete"
-   >
+  >
     <template #append>
       <q-btn
         flat

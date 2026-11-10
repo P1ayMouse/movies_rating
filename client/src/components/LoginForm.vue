@@ -40,7 +40,7 @@ export default {
 
 <template>
   <div class="auth-page">
-    <div class="auth-card">
+    <div v-reveal class="auth-card">
       <h1 class="auth-title">Welcome back</h1>
       <p class="auth-subtitle">Log in to {{ appName }} to rate movies and manage your account.</p>
 

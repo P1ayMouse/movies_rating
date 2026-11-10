@@ -184,7 +184,7 @@ export default {
     </div>
 
     <template v-else>
-      <section class="detail-overview" aria-labelledby="movie-title">
+      <section v-reveal class="detail-overview" aria-labelledby="movie-title">
         <div class="detail-summary">
           <div class="detail-heading">
             <p v-if="releaseYear" class="detail-overline">{{ releaseYear }}</p>
@@ -241,6 +241,7 @@ export default {
 
       <section
         v-if="peopleLoading || peopleError || people.length"
+        v-reveal
         class="detail-section"
         aria-labelledby="movie-credits-title"
       >
@@ -284,7 +285,12 @@ export default {
         </q-table>
       </section>
 
-      <section id="similar-movies" class="detail-section" aria-labelledby="similar-movies-title">
+      <section
+        id="similar-movies"
+        v-reveal
+        class="detail-section"
+        aria-labelledby="similar-movies-title"
+      >
         <h2 id="similar-movies-title">Similar movies</h2>
         <p class="detail-section-description">Popular picks in the same genres.</p>
 
@@ -297,8 +303,9 @@ export default {
         </div>
         <div v-else-if="similarMovies.length" class="movie-tiles">
           <movie-tile
-            v-for="similarMovie in similarMovies"
+            v-for="(similarMovie, index) in similarMovies"
             :key="similarMovie.id"
+            v-reveal="index"
             :movie="similarMovie"
           />
         </div>

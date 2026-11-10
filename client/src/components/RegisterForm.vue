@@ -84,7 +84,7 @@ export default {
 
 <template>
   <div class="auth-page">
-    <div class="auth-card">
+    <div v-reveal class="auth-card">
       <h1 class="auth-title">Create an account</h1>
       <p class="auth-subtitle">Join {{ appName }} in a minute.</p>
 

@@ -152,7 +152,7 @@ export default {
     </div>
 
     <template v-else>
-      <header class="profile-header">
+      <header v-reveal class="profile-header">
         <span class="profile-avatar" aria-hidden="true">{{ initial }}</span>
         <div class="profile-identity">
           <h1>{{ displayName }}</h1>
@@ -161,7 +161,7 @@ export default {
         <q-btn class="profile-logout" flat no-caps icon="logout" label="Log out" @click="logOut" />
       </header>
 
-      <section class="profile-card" aria-labelledby="profile-details-title">
+      <section v-reveal="1" class="profile-card" aria-labelledby="profile-details-title">
         <div class="profile-card-intro">
           <h2 id="profile-details-title">Account details</h2>
           <p>Your username is shown in the header.</p>
@@ -209,7 +209,7 @@ export default {
         </form>
       </section>
 
-      <section class="profile-card" aria-labelledby="profile-password-title">
+      <section v-reveal="2" class="profile-card" aria-labelledby="profile-password-title">
         <div class="profile-card-intro">
           <h2 id="profile-password-title">Change password</h2>
           <p>Pick a new password you don't use anywhere else.</p>

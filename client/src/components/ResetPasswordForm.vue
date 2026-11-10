@@ -65,7 +65,7 @@ export default {
 
 <template>
   <div class="auth-page">
-    <div class="auth-card">
+    <div v-reveal class="auth-card">
       <h1 class="auth-title">Set a new password</h1>
       <p class="auth-subtitle">Pick a password you don't use anywhere else.</p>
 
