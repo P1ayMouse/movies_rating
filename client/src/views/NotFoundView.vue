@@ -7,12 +7,12 @@ document.title = pageTitle('Page not found');
 
 // Kernels that pop all the time
 const KERNELS = [
-  { dx: -70, peak: -120, rot: -200, delay: 0 },
-  { dx: 55, peak: -150, rot: 160, delay: 0.35 },
-  { dx: -25, peak: -175, rot: 260, delay: 0.7 },
-  { dx: 85, peak: -105, rot: -140, delay: 1.05 },
-  { dx: -95, peak: -95, rot: 120, delay: 1.4 },
-  { dx: 15, peak: -135, rot: -280, delay: 1.75 }
+  { dx: -70, peak: -70, rot: -200, delay: 0 },
+  { dx: 55, peak: -90, rot: 160, delay: 0.45 },
+  { dx: -25, peak: -105, rot: 260, delay: 0.9 },
+  { dx: 85, peak: -60, rot: -140, delay: 1.35 },
+  { dx: -95, peak: -55, rot: 120, delay: 1.8 },
+  { dx: 15, peak: -80, rot: -280, delay: 2.25 }
 ];
 
 // Extra kernels from a click. Each one removes itself when its animation ends
@@ -26,7 +26,7 @@ function popMore() {
   const handful = Array.from({ length: 12 }, () => ({
     id: nextId++,
     dx: Math.round(random(-170, 170)),
-    peak: Math.round(random(-170, -100)),
+    peak: Math.round(random(-110, -65)),
     rot: Math.round(random(-360, 360)),
     size: Math.round(random(16, 28))
   }));
