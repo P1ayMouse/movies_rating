@@ -1,0 +1,160 @@
+// Movie page parts that the person page does not have: genres, rating, cast table.
+// Shared layout is in _detail-page.scss.
+@use 'variables' as *;
+
+.movie-page {
+  .movie-genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: $header-bg;
+      color: $muted-text;
+      font-size: 13px;
+    }
+  }
+
+  .movie-score {
+    margin-top: 24px;
+  }
+
+  .movie-score-label {
+    margin: 0 0 4px;
+    color: $muted-text;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .movie-score-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.25;
+
+    .q-icon {
+      color: #b7790b;
+      font-size: 30px;
+    }
+  }
+
+  .movie-score-number {
+    font-size: 32px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .movie-score-scale {
+    color: $muted-text;
+    font-size: 18px;
+  }
+
+  .movie-votes {
+    margin: 4px 0 0;
+    color: $muted-text;
+    font-size: 13px;
+  }
+
+  .movie-unrated {
+    margin: 0;
+    font-size: 22px;
+  }
+
+  .movie-credits {
+    margin-top: 20px;
+    border-radius: $radius;
+
+    th {
+      background: $header-bg;
+      color: $muted-text;
+      font-size: 13px;
+    }
+
+    td {
+      font-size: 14px;
+    }
+  }
+
+  // Thin, faint underline that turns gold together with the name on hover
+  .movie-person-link {
+    color: $text-color;
+    text-decoration: underline;
+    text-decoration-color: rgb(33 37 41 / 25%);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: $accent-text;
+      text-decoration-color: currentColor;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .movie-genres {
+      gap: 6px;
+      margin-top: 0;
+
+      li {
+        padding: 3px 8px;
+        font-size: 12px;
+      }
+    }
+
+    .movie-score {
+      margin-top: 16px;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .movie-score-value {
+      gap: 6px;
+
+      .q-icon {
+        font-size: 26px;
+      }
+    }
+
+    .movie-score-number {
+      font-size: 28px;
+    }
+
+    .movie-score-scale {
+      font-size: 16px;
+    }
+
+    .movie-credits {
+      th,
+      td {
+        padding: 10px 8px;
+        overflow-wrap: anywhere;
+      }
+
+      // The hidden sort arrow still takes space and wraps to a second line in narrow
+      // columns, pushing the label up. Take it out of the flow so it can't wrap.
+      th {
+        overflow-wrap: normal;
+      }
+
+      th.sortable {
+        position: relative;
+      }
+
+      .q-table__sort-icon {
+        position: absolute;
+        margin-left: 2px;
+        font-size: 14px;
+      }
+    }
+  }
+}

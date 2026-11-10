@@ -1,0 +1,21 @@
+@use 'variables' as *;
+
+// Quasar's main colour (focused fields and other highlights)
+:root {
+  --q-primary: #{$accent-text};
+}
+
+body {
+  color: $text-color;
+  background-color: $page-bg;
+}
+
+.text-font {
+  font-family: $font-family;
+  text-decoration: none;
+}
+
+.popcorn-icon {
+  background-color: currentColor;
+  mask: url('@/assets/popcorn.svg') center / contain no-repeat;
+}

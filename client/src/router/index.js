@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { ensureUserLoaded, nextPath } from '../auth.js';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import ForgotPasswordView from '../views/ForgotPasswordView.vue';
@@ -7,6 +8,7 @@ import MoviesListView from '../views/MoviesListView.vue';
 import ProfileView from '../views/ProfileView.vue';
 import MovieView from '../views/MovieView.vue';
 import PersonView from '../views/PersonView.vue';
+import NotFoundView from '../views/NotFoundView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,12 +20,14 @@ const router = createRouter({
     {
       path: '/login/',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+      meta: { guestOnly: true }
     },
     {
       path: '/register/',
       name: 'register',
-      component: RegisterView
+      component: RegisterView,
+      meta: { guestOnly: true }
     },
     {
       path: '/password-forgot/',
@@ -63,8 +67,20 @@ const router = createRouter({
       name: 'person',
       component: PersonView,
       props: true
+    },
+    {
+      // Any other address
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: NotFoundView
     }
   ]
+});
+
+router.beforeEach(async (to) => {
+  if (!to.meta.guestOnly) return true;
+  const user = await ensureUserLoaded();
+  return user ? nextPath(to) : true;
 });
 
 export default router;

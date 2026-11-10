@@ -1,161 +1,125 @@
 <script>
-import { useQuasar } from 'quasar';
-import axios from 'axios';
+import { QBtn, QIcon, QInput } from 'quasar';
+import PasswordInput from './PasswordInput.vue';
+import { APP_NAME } from '../brand.js';
+import { logIn, nextPath } from '@/auth';
+import { errorMessage } from '@/errors';
+
+const MIN_LENGTH = 6;
 
 export default {
   name: 'RegisterForm',
+  components: { PasswordInput, QBtn, QIcon, QInput },
   data() {
     return {
-      user: {
-        email: '',
-        password: '',
-        password2: '',
-        username: ''
-      },
-      formError: null
+      appName: APP_NAME,
+      username: '',
+      email: '',
+      password: '',
+      password2: '',
+      loading: false,
+      formError: ''
     };
   },
-  setup() {
-    const $q = useQuasar();
-    return { $q };
-  },
   methods: {
-    async onUserRegister(e) {
-      e.preventDefault();
-      this.formError = null;
-
-      await axios.get('/sanctum/csrf-cookie');
-
-      const response = await fetch('/api/v1/auth/user-registration/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.user)
-      });
-
-      const responseData = await response.json();
-
-      if (response.status === 201) {
-        this.positiveNotify();
-        this.$router.push('/login');
-      } else {
-        switch (response.status) {
-          case 400:
-            if (responseData.detail !== undefined) {
-              this.formError = responseData.detail;
-            } else if (responseData.email !== undefined) {
-              this.formError = responseData.email[0];
-            } else if (responseData.username !== undefined) {
-              this.formError = responseData.username[0];
-            } else {
-              this.formError = 'Unknown error';
-            }
-            break;
-          default:
-            this.formError = 'Unknown error';
-            break;
-        }
-        this.errorNotify();
+    // Same rules as the server, checked first so people don't wait for a request
+    validate() {
+      if (!this.username.trim() || !this.email.trim() || !this.password || !this.password2) {
+        return 'Fill in all fields.';
       }
+      if (this.username.trim().length < MIN_LENGTH) {
+        return `Username must be at least ${MIN_LENGTH} characters.`;
+      }
+      if (!this.email.includes('@')) return 'Enter a valid email.';
+      if (this.password.length < MIN_LENGTH) {
+        return `Password must be at least ${MIN_LENGTH} characters.`;
+      }
+      if (this.password !== this.password2) return 'Passwords do not match.';
+      return '';
     },
-    positiveNotify() {
-      this.$q.notify({
-        message: 'Register is successful!',
-        color: 'positive',
-        position: 'top',
-        textColor: 'white',
-        actions: [{ icon: 'close', color: 'white' }],
-        html: true,
-        timeout: 2000
-      });
-    },
-    errorNotify() {
-      this.$q.notify({
-        message: this.formError,
-        color: 'negative',
-        position: 'top',
-        textColor: 'white',
-        actions: [{ icon: 'close', color: 'white' }],
-        html: true,
-        timeout: 2000
-      });
+    async onRegister() {
+      this.formError = this.validate();
+      if (this.formError) return;
+
+      this.loading = true;
+      try {
+        const email = this.email.trim();
+        const response = await fetch('/api/v1/auth/user-registration/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: this.username.trim(),
+            email,
+            password: this.password,
+            password2: this.password2
+          })
+        });
+        if (!response.ok) {
+          this.formError = await errorMessage(response);
+          return;
+        }
+
+        // Log straight in, so people don't have to type the password again
+        const loginError = await logIn(email, this.password);
+        if (loginError) {
+          this.$router.push({ name: 'login', query: this.$route.query });
+          return;
+        }
+        this.$q.notify({
+          message: `Welcome to ${this.appName}!`,
+          color: 'positive',
+          position: 'top',
+          timeout: 2000
+        });
+        this.$router.push(nextPath(this.$route));
+      } catch {
+        this.formError = 'Network error. Please try again.';
+      } finally {
+        this.loading = false;
+      }
     }
   }
 };
 </script>
 
 <template>
-  <div class="text-font">
-    <div class="d-flex justify-content-center align-items-center">
-      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
-        <q-card-section class="text-h5 text-center q-mb-md"> Register </q-card-section>
-        <q-form @submit="onUserRegister" class="q-gutter-md">
-          <q-input
-            outlined
-            v-model="user.email"
-            placeholder="Input your email"
-            type="email"
-            label="e-mail"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.password"
-            placeholder="Input your password"
-            type="password"
-            label="password"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.password2"
-            placeholder="Repeat password"
-            type="password"
-            label="repeat password"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.username"
-            placeholder="Input your username"
-            label="username"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <div class="text-center">
-            <q-btn
-              label="Register"
-              outline
-              type="submit"
-              color="grey"
-              class="form-button q-mb-md"
-            ></q-btn>
-          </div>
-        </q-form>
-      </q-card>
+  <div class="auth-page">
+    <div v-reveal class="auth-card">
+      <h1 class="auth-title">Create an account</h1>
+      <p class="auth-subtitle">Join {{ appName }} in a minute.</p>
+
+      <form class="auth-fields" novalidate @submit.prevent="onRegister">
+        <q-input
+          v-model="username"
+          outlined
+          label="Username"
+          autocomplete="nickname"
+          maxlength="150"
+          autofocus
+        />
+        <q-input v-model="email" outlined type="email" label="Email" autocomplete="email" />
+        <password-input v-model="password" autocomplete="new-password" />
+        <password-input v-model="password2" label="Repeat password" autocomplete="new-password" />
+
+        <p v-if="formError" class="auth-error" role="alert">
+          <q-icon name="error_outline" size="18px" aria-hidden="true" />
+          {{ formError }}
+        </p>
+
+        <q-btn
+          type="submit"
+          unelevated
+          no-caps
+          label="Create account"
+          class="auth-submit"
+          :loading="loading"
+        />
+      </form>
+
+      <p class="auth-footer">
+        Already have an account?
+        <router-link :to="{ name: 'login', query: $route.query }">Log in</router-link>
+      </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.text-font {
-  text-decoration: none;
-  font-family: 'Comic Sans MS', sans-serif;
-  color: black;
-}
-.form-button {
-  border-radius: 5px;
-}
-.notification {
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-</style>

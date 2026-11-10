@@ -1,0 +1,9 @@
+// Person page parts that the movie page does not have.
+// Shared layout is in _detail-page.scss.
+.person-page {
+  .person-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 40px;
+  }
+}

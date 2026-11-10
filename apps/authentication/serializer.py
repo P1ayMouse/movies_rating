@@ -90,7 +90,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         link = f'{settings.SITE_URL}/password-reset/{user_token.token}/'
         hours = int(settings.PASSWORD_RESET_LINK_LIFETIME.total_seconds() // 3600)
         send_mail(
-            subject='Reset your Diploma MDB password',
+            subject=f'Reset your {settings.SITE_NAME} password',
             message=(
                 f'To set a new password, open this link:\n\n{link}\n\n'
                 f'The link works once and expires in {hours} hour(s). '

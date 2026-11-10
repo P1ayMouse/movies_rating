@@ -1,125 +1,106 @@
 <script>
-import { useQuasar } from 'quasar';
+import { QBtn, QIcon } from 'quasar';
+import PasswordInput from './PasswordInput.vue';
 import { errorMessage } from '@/errors';
+
+const MIN_LENGTH = 6;
 
 export default {
   name: 'ResetPasswordForm',
+  components: { PasswordInput, QBtn, QIcon },
   props: {
-    token: {
-      type: String,
-      required: true
-    }
+    token: { type: String, required: true }
   },
   data() {
     return {
-      user: {},
-      sending: false
+      password: '',
+      password2: '',
+      loading: false,
+      formError: ''
     };
   },
-  setup() {
-    const $q = useQuasar();
-    return { $q };
-  },
   methods: {
-    async onResetPassword() {
-      this.sending = true;
+    async onReset() {
+      this.formError = '';
+      if (this.password.length < MIN_LENGTH) {
+        this.formError = `Password must be at least ${MIN_LENGTH} characters.`;
+        return;
+      }
+      if (this.password !== this.password2) {
+        this.formError = 'Passwords do not match.';
+        return;
+      }
+
+      this.loading = true;
       try {
         const response = await fetch('/api/v1/auth/password-reset/confirm/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             token: this.token,
-            password: this.user.password,
-            password2: this.user.password2
+            password: this.password,
+            password2: this.password2
           })
         });
-        if (response.status === 200) {
-          this.notify('Password changed. Log in with your new password.', 'positive');
-          this.$router.push('/login/');
-        } else {
-          this.notify(await errorMessage(response), 'negative');
+        if (!response.ok) {
+          this.formError = await errorMessage(response);
+          return;
         }
+        this.$q.notify({
+          message: 'Password changed. Log in with your new password.',
+          color: 'positive',
+          position: 'top',
+          timeout: 3000
+        });
+        this.$router.push({ name: 'login' });
       } catch {
-        this.notify('Network error', 'negative');
+        this.formError = 'Network error. Please try again.';
       } finally {
-        this.sending = false;
+        this.loading = false;
       }
-    },
-    notify(message, color) {
-      this.$q.notify({
-        message,
-        color,
-        position: 'top',
-        textColor: 'white',
-        actions: [{ icon: 'close', color: 'white' }],
-        timeout: 3000
-      });
-    },
-    goToForgotPassword() {
-      this.$router.push('/password-forgot/');
     }
   }
 };
 </script>
 
 <template>
-  <div class="text-font">
-    <div class="d-flex justify-content-center align-items-center">
-      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
-        <q-card-section class="text-h5 text-center q-mb-md"> New Password </q-card-section>
-        <q-form @submit.prevent="onResetPassword" class="q-gutter-md">
-          <q-input
-            outlined
-            v-model="user.password"
-            placeholder="Input your new password"
-            type="password"
-            label="new password"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.password2"
-            placeholder="Repeat your new password"
-            type="password"
-            label="repeat password"
-            required
-            color="grey"
-            class="q-mb-md"
-          />
-          <div class="text-center">
-            <q-btn
-              label="Change password"
-              outline
-              type="submit"
-              color="grey"
-              :loading="sending"
-              class="form-button q-mb-md"
-            ></q-btn>
-          </div>
-          <div class="text-center">
-            <q-btn
-              flat
-              color="primary"
-              no-caps
-              label="Send a new link"
-              @click="goToForgotPassword"
-            />
-          </div>
-        </q-form>
-      </q-card>
+  <div class="auth-page">
+    <div v-reveal class="auth-card">
+      <h1 class="auth-title">Set a new password</h1>
+      <p class="auth-subtitle">Pick a password you don't use anywhere else.</p>
+
+      <form class="auth-fields" novalidate @submit.prevent="onReset">
+        <password-input
+          v-model="password"
+          label="New password"
+          autocomplete="new-password"
+          autofocus
+        />
+        <password-input
+          v-model="password2"
+          label="Repeat new password"
+          autocomplete="new-password"
+        />
+
+        <p v-if="formError" class="auth-error" role="alert">
+          <q-icon name="error_outline" size="18px" aria-hidden="true" />
+          {{ formError }}
+        </p>
+
+        <q-btn
+          type="submit"
+          unelevated
+          no-caps
+          label="Change password"
+          class="auth-submit"
+          :loading="loading"
+        />
+      </form>
+
+      <p class="auth-footer">
+        Link expired?
+        <router-link :to="{ name: 'password-forgot' }">Send a new one</router-link>
+      </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.text-font {
-  text-decoration: none;
-  font-family: 'Comic Sans MS', sans-serif;
-  color: black;
-}
-.form-button {
-  border-radius: 5px;
-}
-</style>

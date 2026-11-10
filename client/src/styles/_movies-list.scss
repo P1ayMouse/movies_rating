@@ -1,0 +1,414 @@
+@use 'variables' as *;
+
+.movies-list-page {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 28px 24px 48px;
+
+  a:focus-visible {
+    outline: 2px solid $text-color;
+    outline-offset: 4px;
+  }
+
+  .movies-list-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-bottom: 28px;
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 3vw, 34px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .movies-list-count {
+    margin: 6px 0 0;
+    color: $muted-text;
+    font-size: 14px;
+  }
+
+  .movies-list-clear,
+  .movies-list-browse {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    color: $muted-text;
+
+    &:hover {
+      color: $text-color;
+    }
+  }
+
+  .movies-list-clear {
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  // Loading, error and empty states
+  .movies-list-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 56px 16px;
+    color: $muted-text;
+    text-align: center;
+
+    h2 {
+      margin: 0;
+      color: $text-color;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+    gap: 32px 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transition: opacity 0.2s;
+
+    &.is-loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
+  .movie-card {
+    display: block;
+    border-radius: $radius;
+    color: $text-color;
+    text-decoration: none;
+
+    // Hover and keyboard focus for the poster
+    // Slide up over a dark fade, the title turns gold like the rating star
+    &:hover,
+    &:focus-visible {
+      .movie-card-poster {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgb(0 0 0 / 18%);
+
+        &::after {
+          opacity: 1;
+        }
+      }
+
+      .movie-card-rating {
+        opacity: 0;
+      }
+
+      .movie-card-details {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .movie-card-title {
+        color: $accent-text;
+      }
+    }
+  }
+
+  .movie-card-poster {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: $radius;
+    background: $card-header-bg;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+
+    // Dark fade under the details, shown on hover
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        to top,
+        rgb(0 0 0 / 90%) 0%,
+        rgb(0 0 0 / 70%) 40%,
+        transparent 75%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+  }
+
+  // Details shown over the poster on hover
+  .movie-card-details {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    padding: 12px;
+    color: white;
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.25s ease,
+      transform 0.3s ease;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .movie-card-details-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    .q-icon {
+      color: #f5c518;
+    }
+
+    span {
+      color: rgb(255 255 255 / 70%);
+      font-size: 13px;
+      font-weight: 400;
+    }
+  }
+
+  .movie-card-details-votes {
+    color: rgb(255 255 255 / 75%);
+  }
+
+  .movie-card-details-directors {
+    display: -webkit-box;
+    padding-top: 8px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .movie-card-details-genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 2px 8px;
+      border: 1px solid rgb(255 255 255 / 45%);
+      border-radius: 999px;
+      font-size: 11px;
+    }
+  }
+
+  .movie-card-poster .poster-placeholder {
+    gap: 8px;
+  }
+
+  // Rating badge on top of the poster
+  .movie-card-rating {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    z-index: 2;
+    transition: opacity 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px 3px 6px;
+    border-radius: 6px;
+    background: rgb(0 0 0 / 75%);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    .q-icon {
+      color: #f5c518;
+    }
+  }
+
+  .movie-card-title {
+    display: -webkit-box;
+    margin: 12px 0 0;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    transition: color 0.2s ease;
+  }
+
+  .movie-card-meta {
+    margin: 4px 0 0;
+    overflow: hidden;
+    color: $muted-text;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 32px 0 12px;
+  }
+
+  .pagination-container--top {
+    margin: 0 0 24px;
+  }
+
+  .movie-pagination {
+    display: grid;
+    grid-template-columns: repeat(2, auto) minmax(0, 1fr) repeat(2, auto);
+    align-items: center;
+    gap: 0;
+    max-width: 100%;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .movie-pagination__button,
+  .movie-pagination__input {
+    min-height: 44px;
+    background: transparent;
+    color: $muted-text;
+    font: inherit;
+
+    &:focus-visible {
+      outline: 2px solid $text-color;
+      outline-offset: 3px;
+    }
+  }
+
+  .movie-pagination__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: $header-bg;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+
+  .movie-pagination__jump {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .movie-pagination__input {
+    // Include horizontal padding, borders, and space for the caret
+    width: calc(var(--page-digits) * 1ch + 16px);
+    flex-shrink: 0;
+    min-width: 44px;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
+
+    &:hover,
+    &:focus {
+      border-color: $border-color;
+      background: $header-bg;
+    }
+  }
+
+  .movie-pagination__total {
+    margin-inline-end: 6px;
+    color: $muted-text;
+    font-size: 16px;
+  }
+
+  @media (min-width: 577px) {
+    .pagination-container--top {
+      display: none;
+    }
+  }
+
+  // Phones and tablets have no hover, so the details would only flash on tap
+  @media (hover: none) {
+    .movie-card-details {
+      display: none;
+    }
+  }
+
+  // No movement for people who turned off animations in their system
+  @media (prefers-reduced-motion: reduce) {
+    .movie-card-poster,
+    .movie-card-details {
+      transition: none;
+    }
+
+    .movie-card:hover,
+    .movie-card:focus-visible {
+      .movie-card-poster,
+      .movie-card-details {
+        transform: none;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 16px 16px 32px;
+
+    .movies-list-header {
+      margin-bottom: 20px;
+    }
+
+    .movies-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 12px;
+    }
+
+    .movie-card-title {
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .movie-card-meta {
+      font-size: 12px;
+    }
+  }
+}

@@ -1,51 +1,78 @@
 <script>
-import { useQuasar } from 'quasar';
-import { authFetch, authState } from '@/auth';
+import { QBtn, QIcon, QInput, QSpinnerDots, useQuasar } from 'quasar';
+import PasswordInput from './PasswordInput.vue';
+import { pageTitle } from '../brand.js';
+import { authFetch, authState, clearTokens } from '@/auth';
 import { errorMessage } from '@/errors';
+
+const MIN_LENGTH = 6;
 
 export default {
   name: 'ProfileForm',
-
+  components: { PasswordInput, QBtn, QIcon, QInput, QSpinnerDots },
+  setup() {
+    return { $q: useQuasar() };
+  },
   data() {
     return {
+      loading: true,
+      loadError: '',
       user: {},
-      userLoaded: false,
-      formError: null
+      // Account details form
+      username: '',
+      savingDetails: false,
+      detailsError: '',
+      // Password form
+      password: '',
+      password2: '',
+      savingPassword: false,
+      passwordError: ''
     };
   },
-  setup() {
-    const $q = useQuasar();
-    return { $q };
+  computed: {
+    displayName() {
+      return this.user.username || this.user.email || '';
+    },
+    initial() {
+      return (this.displayName || '?').charAt(0).toUpperCase();
+    },
+    detailsChanged() {
+      return this.username.trim() !== (this.user.username || '');
+    },
+    passwordReady() {
+      return Boolean(this.password && this.password2);
+    }
   },
-  async mounted() {
-    let response;
-    try {
-      response = await authFetch('/api/v1/auth/user-info/');
-    } catch {
-      this.showError('Network error');
-      return;
-    }
-
-    if (response.status === 200) {
-      this.user = await response.json();
-      document.title = 'Profile of ' + (this.user.username || this.user.email);
-      this.userLoaded = true;
-    } else if (response.status === 403) {
-      // the session could not be renewed, so log in again
-      this.$router.push('/login');
-    } else {
-      this.showError(`Server error ${response.status}`);
-    }
+  mounted() {
+    this.loadUser();
   },
   methods: {
-    async onUserEditProfile() {
-      this.formError = null;
-      const body = { username: this.user.username };
-      if (this.user.password || this.user.password2) {
-        body.password = this.user.password;
-        body.password2 = this.user.password2;
+    async loadUser() {
+      this.loading = true;
+      this.loadError = '';
+      try {
+        const response = await authFetch('/api/v1/auth/user-info/');
+        if (response.status === 403) {
+          // The session could not be renewed, so log in again
+          this.$router.push({ name: 'login', query: { next: '/profile/' } });
+          return;
+        }
+        if (!response.ok) throw new Error(`Server error ${response.status}`);
+        this.setUser(await response.json());
+      } catch {
+        this.loadError = 'We could not load your profile. Please try again.';
+      } finally {
+        this.loading = false;
       }
-
+    },
+    setUser(user) {
+      this.user = user;
+      this.username = user.username || '';
+      authState.user = { ...user };
+      document.title = pageTitle(this.displayName ? `Profile of ${this.displayName}` : 'Profile');
+    },
+    // Sends a PATCH and returns the error text, or '' on success
+    async patchUser(body) {
       let response;
       try {
         response = await authFetch('/api/v1/auth/user-info/', {
@@ -53,108 +80,178 @@ export default {
           body: JSON.stringify(body)
         });
       } catch {
-        this.showError('Network error');
+        return 'Network error. Please try again.';
+      }
+      if (response.status === 403) {
+        this.$router.push({ name: 'login', query: { next: '/profile/' } });
+        return '';
+      }
+      if (!response.ok) return errorMessage(response);
+      this.setUser(await response.json());
+      return '';
+    },
+    resetDetails() {
+      this.username = this.user.username || '';
+      this.detailsError = '';
+    },
+    async saveDetails() {
+      this.detailsError = '';
+      if (this.username.trim().length < MIN_LENGTH) {
+        this.detailsError = `Username must be at least ${MIN_LENGTH} characters.`;
         return;
       }
-
-      if (response.status === 200) {
-        this.user = await response.json();
-        authState.user = { ...this.user };
-        document.title = 'Profile of ' + (this.user.username || this.user.email);
-        this.$q.notify({
-          message: 'Profile updated',
-          color: 'positive',
-          position: 'top',
-          timeout: 2000
-        });
-      } else if (response.status === 403) {
-        this.$router.push('/login');
-      } else {
-        this.showError(await errorMessage(response));
+      this.savingDetails = true;
+      this.detailsError = await this.patchUser({ username: this.username.trim() });
+      this.savingDetails = false;
+      if (!this.detailsError) this.notifySaved('Profile updated');
+    },
+    async savePassword() {
+      this.passwordError = '';
+      if (this.password.length < MIN_LENGTH) {
+        this.passwordError = `Password must be at least ${MIN_LENGTH} characters.`;
+        return;
+      }
+      if (this.password !== this.password2) {
+        this.passwordError = 'Passwords do not match.';
+        return;
+      }
+      this.savingPassword = true;
+      this.passwordError = await this.patchUser({
+        password: this.password,
+        password2: this.password2
+      });
+      this.savingPassword = false;
+      if (!this.passwordError) {
+        this.password = '';
+        this.password2 = '';
+        this.notifySaved('Password changed');
       }
     },
-    showError(message) {
-      this.formError = message;
-      this.$q.notify({
-        message,
-        color: 'negative',
-        position: 'top',
-        textColor: 'white',
-        actions: [{ icon: 'close', color: 'white' }],
-        timeout: 2000
-      });
+    notifySaved(message) {
+      this.$q.notify({ message, color: 'positive', position: 'top', timeout: 2000 });
+    },
+    logOut() {
+      clearTokens();
+      this.$router.push({ name: 'login' });
     }
   }
 };
 </script>
 
 <template>
-  <div class="text-font">
-    <!--    <div v-if="formError" class="alert alert-danger" role="alert">-->
-    <!--      {{ formError }}-->
-    <!--    </div>-->
-    <div class="d-flex justify-content-center align-items-center">
-      <q-card class="q-pa-md q-ma-md" style="max-width: 400px; width: 100%">
-        <q-card-section class="text-h5 text-center q-mb-md"> Profile </q-card-section>
-        <q-form @submit.prevent="onUserEditProfile" class="q-gutter-md">
-          <q-input
-            outlined
-            v-model="user.email"
-            placeholder="Input your email"
-            type="email"
-            label="e-mail"
-            readonly
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.username"
-            placeholder="Input your username"
-            label="username"
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.password"
-            placeholder="Input your password"
-            type="password"
-            label="password"
-            color="grey"
-            class="q-mb-md"
-          />
-          <q-input
-            outlined
-            v-model="user.password2"
-            placeholder="Repeat your password"
-            type="password"
-            label="repeat password"
-            color="grey"
-            class="q-mb-md"
-          />
-          <div class="text-center">
-            <q-btn
-              label="Update"
-              outline
-              type="submit"
-              color="grey"
-              class="form-button q-mb-md"
-            ></q-btn>
-          </div>
-        </q-form>
-      </q-card>
+  <div class="profile-page">
+    <div v-if="loading" class="profile-status" role="status">
+      <q-spinner-dots color="grey-8" size="40px" aria-hidden="true" />
+      <p>Loading your profile…</p>
     </div>
+
+    <div v-else-if="loadError" class="profile-status" role="alert">
+      <h1>Unable to load profile</h1>
+      <p>{{ loadError }}</p>
+      <q-btn outline no-caps label="Try again" @click="loadUser" />
+    </div>
+
+    <template v-else>
+      <header v-reveal class="profile-header">
+        <span class="profile-avatar" aria-hidden="true">{{ initial }}</span>
+        <div class="profile-identity">
+          <h1>{{ displayName }}</h1>
+          <p v-if="user.username">{{ user.email }}</p>
+        </div>
+        <q-btn class="profile-logout" flat no-caps icon="logout" label="Log out" @click="logOut" />
+      </header>
+
+      <section v-reveal="1" class="profile-card" aria-labelledby="profile-details-title">
+        <div class="profile-card-intro">
+          <h2 id="profile-details-title">Account details</h2>
+          <p>Your username is shown in the header.</p>
+        </div>
+
+        <form class="profile-fields" novalidate @submit.prevent="saveDetails">
+          <q-input :model-value="user.email" outlined readonly label="Email">
+            <template #append>
+              <q-icon name="lock_outline" size="18px" />
+            </template>
+          </q-input>
+
+          <q-input
+            v-model="username"
+            outlined
+            label="Username"
+            autocomplete="username"
+            maxlength="150"
+          />
+
+          <p v-if="detailsError" class="profile-error" role="alert">
+            <q-icon name="error_outline" size="18px" aria-hidden="true" />
+            {{ detailsError }}
+          </p>
+
+          <div class="profile-actions">
+            <q-btn
+              v-if="detailsChanged"
+              flat
+              no-caps
+              label="Cancel"
+              class="profile-button-secondary"
+              @click="resetDetails"
+            />
+            <q-btn
+              type="submit"
+              unelevated
+              no-caps
+              label="Save changes"
+              class="profile-button"
+              :disable="!detailsChanged"
+              :loading="savingDetails"
+            />
+          </div>
+        </form>
+      </section>
+
+      <section v-reveal="2" class="profile-card" aria-labelledby="profile-password-title">
+        <div class="profile-card-intro">
+          <h2 id="profile-password-title">Change password</h2>
+          <p>Pick a new password you don't use anywhere else.</p>
+        </div>
+
+        <form class="profile-fields" novalidate @submit.prevent="savePassword">
+          <!-- Lets password managers link the new password to this account -->
+          <input
+            :value="user.email"
+            type="email"
+            autocomplete="username"
+            class="profile-hidden-username"
+            tabindex="-1"
+            aria-hidden="true"
+            readonly
+          />
+
+          <password-input v-model="password" label="New password" autocomplete="new-password" />
+          <password-input
+            v-model="password2"
+            label="Repeat new password"
+            autocomplete="new-password"
+          />
+
+          <p v-if="passwordError" class="profile-error" role="alert">
+            <q-icon name="error_outline" size="18px" aria-hidden="true" />
+            {{ passwordError }}
+          </p>
+
+          <div class="profile-actions">
+            <q-btn
+              type="submit"
+              unelevated
+              no-caps
+              label="Update password"
+              class="profile-button"
+              :disable="!passwordReady"
+              :loading="savingPassword"
+            />
+          </div>
+        </form>
+      </section>
+    </template>
   </div>
 </template>
-
-<style scoped>
-.text-font {
-  text-decoration: none;
-  font-family: 'Comic Sans MS', sans-serif;
-}
-
-.form-button {
-  border-radius: 5px;
-}
-</style>

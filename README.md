@@ -1,4 +1,4 @@
-# Movies Rating
+# PopRank
 
 A catalog of movies and film people built on a sample of IMDb data: search, movie and person pages, ratings, user sign-up and login.
 

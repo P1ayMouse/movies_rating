@@ -1,6 +1,7 @@
 <script setup>
+import { pageTitle } from '../brand.js';
 import LoginForm from '../components/LoginForm.vue';
-document.title = 'Login';
+document.title = pageTitle('Login');
 </script>
 
 <template>

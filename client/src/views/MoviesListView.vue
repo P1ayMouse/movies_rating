@@ -1,9 +1,9 @@
 <script setup>
-import MoviesListForm from '../components/MoviesListForm.vue';
+import MoviesList from '../components/MoviesList.vue';
 </script>
 
 <template>
   <main>
-    <MoviesListForm />
+    <MoviesList />
   </main>
 </template>

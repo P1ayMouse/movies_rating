@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { errorMessage } from '@/errors';
 
 const ACCESS_KEY = 'movies_rating-access';
 const REFRESH_KEY = 'movies_rating-refresh';
@@ -52,6 +53,17 @@ export async function authFetch(url, options = {}) {
   return request(url, options);
 }
 
+// Loads the user once. The router and the header may both ask at page load,
+// so they share the same request instead of sending two
+let userRequest = null;
+export function ensureUserLoaded() {
+  if (authState.loaded) return Promise.resolve(authState.user);
+  userRequest ??= loadCurrentUser().finally(() => {
+    userRequest = null;
+  });
+  return userRequest;
+}
+
 export async function loadCurrentUser() {
   authState.error = null;
   try {
@@ -68,4 +80,24 @@ export async function loadCurrentUser() {
   }
   authState.loaded = true;
   return authState.user;
+}
+
+// Gets tokens for the email and password and loads the user
+export async function logIn(email, password) {
+  const response = await fetch('/api/v1/auth/token/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  if (!response.ok) return errorMessage(response);
+  saveTokens(await response.json());
+  await loadCurrentUser();
+  return '';
+}
+
+export function nextPath(route) {
+  const next = route.query.next;
+  return typeof next === 'string' && next.startsWith('/') && !next.startsWith('//')
+    ? next
+    : '/movies/';
 }

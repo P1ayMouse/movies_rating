@@ -1,6 +1,7 @@
 <script setup>
+import { pageTitle } from '../brand.js';
 import RegisterForm from '../components/RegisterForm.vue';
-document.title = 'Register';
+document.title = pageTitle('Register');
 </script>
 
 <template>

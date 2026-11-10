@@ -10,9 +10,16 @@ export default defineConfig({
             template: { transformAssetUrls }
         }),
         quasar({
-            sassVariables: 'src/quasar-variables.sass'
+            sassVariables: false
         })
     ],
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: 'modern-compiler'
+            }
+        }
+    },
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))

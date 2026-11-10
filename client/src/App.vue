@@ -1,117 +1,57 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import SiteSearch from './components/SiteSearch.vue';
+import { APP_NAME, LOGO_ICON } from './brand.js';
 import UserBadge from './components/UserBadge.vue';
 
-const search = ref('');
-const router = useRouter();
+const searchBox = ref(null);
+// Shadow under the header once the page is scrolled
+const scrolled = ref(false);
 
-const onMovieSearch = () => {
-  if (search.value.trim()) {
-    router.push({ name: 'movies-search', params: { search: search.value.trim() } });
-    search.value = '';
-  }
-};
+function onScroll() {
+  scrolled.value = window.scrollY > 4;
+}
+
+// "/" anywhere on the page jumps to the search field
+function onKeydown(event) {
+  if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+  const target = event.target;
+  const typing =
+    target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+  if (typing) return;
+  event.preventDefault();
+  searchBox.value?.focus();
+}
+
+onMounted(() => {
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('keydown', onKeydown);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll);
+  window.removeEventListener('keydown', onKeydown);
+});
 </script>
 
 <template>
-  <header>
-    <nav class="navbar navbar-expand-lg bg-light text-font">
-      <div class="container-fluid d-flex justify-content-between align-items-center">
-        <!-- Site name -->
-        <a href="/movies/" class="site-name"> Diploma MDB </a>
+  <header class="site-header text-font" :class="{ 'is-scrolled': scrolled }">
+    <div class="site-header-inner">
+      <router-link :to="{ name: 'movies' }" class="site-logo" :aria-label="`${APP_NAME} home`">
+        <span class="site-logo-mark" aria-hidden="true">
+          <q-icon :name="LOGO_ICON" size="20px" />
+        </span>
+        <span>Pop<span class="site-logo-accent">Rank</span></span>
+      </router-link>
 
-        <!-- Centered search form -->
-        <div class="d-flex flex-grow-1 justify-content-center">
-          <form class="d-flex align-items-center form-container">
-            <input
-              v-model="search"
-              type="text"
-              placeholder="Search"
-              class="search-input"
-              @keyup.enter="onMovieSearch"
-            />
-            <button type="submit" class="search-button" @click="onMovieSearch">
-              <q-icon name="search" />
-            </button>
-          </form>
-        </div>
+      <SiteSearch ref="searchBox" />
 
-        <!-- User badge -->
-        <div class="user-badge">
-          <UserBadge />
-        </div>
+      <div class="site-user">
+        <UserBadge />
       </div>
-    </nav>
+    </div>
   </header>
 
   <RouterView class="text-font" />
 </template>
-
-<style scoped>
-.text-font {
-  font-family:
-    Comic Sans MS,
-    sans-serif;
-}
-
-.search-input {
-  border: 1px solid #ccc;
-  border-radius: 10px 0 0 10px;
-  padding: 5px 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.search-input:focus {
-  border-color: #999;
-  outline: none;
-}
-
-.search-button {
-  border: 1px solid #ccc;
-  border-left: none;
-  border-radius: 0 10px 10px 0;
-  padding: 5px 10px;
-  background-color: white;
-  cursor: pointer;
-}
-
-.form-container {
-  width: 100%;
-  max-width: 300px;
-  display: flex;
-}
-
-.site-name {
-  color: black;
-  text-decoration: none;
-  font-size: 28px;
-  white-space: nowrap;
-}
-
-.user-badge {
-  margin-left: 20px;
-}
-
-@media screen and (max-width: 767px) {
-  .site-name {
-    margin-bottom: 10px;
-    margin-top: 10px;
-  }
-
-  .container-fluid {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .form-container {
-    width: 100%;
-  }
-
-  .user-badge {
-    margin-bottom: 10px;
-    margin-top: 10px;
-  }
-}
-</style>
