@@ -12,6 +12,12 @@ export default {
     },
     loadError() {
       return authState.error;
+    },
+    displayName() {
+      return this.user.username || this.user.email;
+    },
+    initial() {
+      return (this.displayName || '?').charAt(0).toUpperCase();
     }
   },
   mounted() {
@@ -20,16 +26,7 @@ export default {
   methods: {
     doLogOut() {
       clearTokens();
-      this.$router.push('/login');
-    },
-    doEditAccount() {
-      this.$router.push('/profile');
-    },
-    doMoviesList() {
-      this.$router.push('/movies');
-    },
-    goToLogin() {
-      this.$router.push('/login');
+      this.$router.push({ name: 'login' });
     },
     retryLoad() {
       loadCurrentUser();
@@ -39,35 +36,59 @@ export default {
 </script>
 
 <template>
-  <div v-if="!userLoaded" class="text-font">
-    <q-spinner-dots color="black" size="64px" />
+  <!-- Same size as the avatar, so the header does not jump when the user loads -->
+  <div v-if="!userLoaded" class="user-badge-loading" role="status" aria-label="Loading account">
+    <span class="user-badge-avatar user-badge-avatar--empty" />
   </div>
-  <div v-else-if="user !== null">
-    <q-btn-dropdown flat color="black" no-caps class="user-dropdown">
-      <template v-slot:label>
-        <q-icon name="account_circle" size="md" class="q-mr-sm" />
-        {{ user.username || user.email }}
-      </template>
-      <q-list style="min-width: 150px; overflow: hidden">
-        <q-item clickable v-ripple @click="doEditAccount">
-          <q-item-section> Edit Account </q-item-section>
-        </q-item>
-        <q-item clickable v-ripple @click="doMoviesList">
-          <q-item-section> Movies List </q-item-section>
-        </q-item>
-        <q-separator color="black" inset></q-separator>
-        <q-item clickable v-ripple @click="doLogOut">
-          <q-item-section> Log Out </q-item-section>
-        </q-item>
-      </q-list>
-    </q-btn-dropdown>
-  </div>
-  <div v-else-if="loadError" class="text-font">
-    <q-btn flat color="negative" no-caps icon="error_outline" label="Retry" @click="retryLoad">
-      <q-tooltip>{{ loadError }}</q-tooltip>
-    </q-btn>
-  </div>
-  <div v-else class="text-font">
-    <q-btn flat color="primary" no-caps label="Login" @click="goToLogin" />
+
+  <q-btn-dropdown
+    v-else-if="user !== null"
+    flat
+    no-caps
+    class="user-badge-button"
+    dropdown-icon="expand_more"
+    content-class="user-badge-menu"
+    :menu-offset="[0, 8]"
+    menu-anchor="bottom right"
+    menu-self="top right"
+    auto-close
+  >
+    <template #label>
+      <span class="user-badge-avatar" aria-hidden="true">{{ initial }}</span>
+      <span class="user-badge-name">{{ displayName }}</span>
+    </template>
+
+    <q-list>
+      <q-item :to="{ name: 'profile' }" clickable>
+        <q-item-section avatar>
+          <q-icon name="person_outline" size="20px" />
+        </q-item-section>
+        <q-item-section>Edit account</q-item-section>
+      </q-item>
+      <q-separator />
+      <q-item clickable @click="doLogOut">
+        <q-item-section avatar>
+          <q-icon name="logout" size="20px" />
+        </q-item-section>
+        <q-item-section>Log out</q-item-section>
+      </q-item>
+    </q-list>
+  </q-btn-dropdown>
+
+  <q-btn
+    v-else-if="loadError"
+    flat
+    no-caps
+    color="negative"
+    icon="error_outline"
+    label="Retry"
+    @click="retryLoad"
+  >
+    <q-tooltip>{{ loadError }}</q-tooltip>
+  </q-btn>
+
+  <div v-else class="user-badge-guest">
+    <router-link :to="{ name: 'register' }" class="user-badge-signup">Sign up</router-link>
+    <router-link :to="{ name: 'login' }" class="user-badge-login">Log in</router-link>
   </div>
 </template>

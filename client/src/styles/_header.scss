@@ -1,83 +1,265 @@
 @use 'variables' as *;
 
 .site-header {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 0;
-  background-color: $header-bg;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid $border-color;
+  background: rgba($header-bg, 0.92);
+  backdrop-filter: saturate(180%) blur(12px);
 
-  .site-header-inner {
-    width: 100%;
-    padding: 0 0.75rem;
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid $text-color;
+    outline-offset: 3px;
   }
 
-  .site-name {
-    color: black;
+  .site-header-inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'logo search user';
+    align-items: center;
+    gap: 24px;
+    max-width: 1160px;
+    min-height: 64px;
+    margin: 0 auto;
+    padding: 8px 24px;
+  }
+
+  .site-logo {
+    grid-area: logo;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: $text-color;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     text-decoration: none;
-    font-size: 28px;
+    white-space: nowrap;
+
+    &:hover .site-logo-mark {
+      transform: rotate(-8deg);
+    }
+  }
+
+  .site-logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: $text-color;
+    color: #f5c518;
+    transition: transform 0.2s ease;
+  }
+
+  .site-logo-accent {
+    color: $accent-text;
+  }
+
+  // Search
+  .site-search {
+    grid-area: search;
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    width: 100%;
+    max-width: 480px;
+    height: 42px;
+    border: 1px solid $border-color;
+    border-radius: 999px;
+    background: $page-bg;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      border-color: #bbb;
+    }
+
+    &:focus-within {
+      border-color: $text-color;
+      box-shadow: 0 0 0 3px rgb(33 37 41 / 10%);
+    }
+  }
+
+  .site-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 4px 0 18px;
+    border: 0;
+    background: transparent;
+    color: $text-color;
+    font: inherit;
+    font-size: 15px;
+    outline: none;
+    appearance: none;
+
+    &::placeholder {
+      color: #888;
+    }
+  }
+
+  .site-search-button {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-right: 4px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: $muted-text;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      background: $header-bg;
+      color: $text-color;
+    }
+  }
+
+  .site-user {
+    grid-area: user;
+    justify-self: end;
+  }
+
+  // Account
+  .user-badge-avatar {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: $text-color;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .user-badge-avatar--empty {
+    background: $card-header-bg;
+  }
+
+  .user-badge-button {
+    min-height: 42px;
+    padding: 4px 8px 4px 4px;
+    border-radius: 999px;
+    color: $text-color;
+    font-size: 15px;
+
+    .q-btn__content {
+      flex-wrap: nowrap;
+      gap: 10px;
+    }
+
+    .q-btn-dropdown__arrow {
+      margin-left: 0;
+      color: $muted-text;
+    }
+  }
+
+  .user-badge-name {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .search-area {
-    flex-grow: 1;
-  }
-
-  .form-container {
-    width: 100%;
-    max-width: 300px;
-    display: flex;
-  }
-
-  .search-input {
-    border: 1px solid #ccc;
-    border-radius: 10px 0 0 10px;
-    padding: 5px 10px;
-    width: 100%;
-    box-sizing: border-box;
-
-    &:focus {
-      border-color: #999;
-      outline: none;
-    }
-  }
-
-  .search-button {
-    border: 1px solid #ccc;
-    border-left: none;
-    border-radius: 0 10px 10px 0;
-    padding: 5px 10px;
-    background-color: white;
-    cursor: pointer;
-  }
-
-  .user-badge {
-    margin-left: 20px;
-  }
-
-  .user-dropdown {
-    font-size: 16px;
+  .user-badge-guest {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 6px;
   }
 
-  @media screen and (max-width: $header-mobile) {
+  .user-badge-signup,
+  .user-badge-login {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 15px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .user-badge-signup {
+    color: $muted-text;
+
+    &:hover {
+      background: $header-bg;
+      color: $text-color;
+    }
+  }
+
+  .user-badge-login {
+    background: $text-color;
+    color: white;
+
+    &:hover {
+      background: #000;
+    }
+  }
+
+  // Not sticky here, so it doesn't take a big part of a small screen.
+  @media (max-width: $header-mobile) {
+    position: static;
+
     .site-header-inner {
-      flex-direction: column;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'logo user'
+        'search search';
+      gap: 10px 12px;
+      padding: 10px 16px 12px;
     }
 
-    .site-name {
-      margin-bottom: 10px;
-      margin-top: 10px;
+    .site-logo {
+      font-size: 20px;
     }
 
-    .form-container {
-      width: 100%;
+    .site-search {
+      max-width: none;
     }
 
-    .user-badge {
-      margin-bottom: 10px;
-      margin-top: 10px;
+    .user-badge-name {
+      display: none;
     }
+
+    .user-badge-signup {
+      display: none;
+    }
+  }
+}
+
+// The account menu is rendered outside the header, at the end of body
+.user-badge-menu {
+  min-width: 190px;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 12%);
+  font-family: $font-family;
+
+  .q-item {
+    min-height: 44px;
+    color: $text-color;
+  }
+
+  .q-item__section--avatar {
+    min-width: 36px;
+    color: $muted-text;
   }
 }

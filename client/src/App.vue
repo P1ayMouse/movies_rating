@@ -1,48 +1,54 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import UserBadge from './components/UserBadge.vue';
 
-const search = ref('');
+const route = useRoute();
 const router = useRouter();
+const search = ref('');
 
-const onMovieSearch = () => {
-  if (search.value.trim()) {
-    router.push({ name: 'movies-search', params: { search: search.value.trim() } });
-    search.value = '';
-  }
-};
+// Keep the current query in the box on search pages, clear it everywhere else
+watch(
+  () => route.params.search,
+  (value) => {
+    search.value = value || '';
+  },
+  { immediate: true }
+);
+
+function onMovieSearch() {
+  const query = search.value.trim();
+  if (query) router.push({ name: 'movies-search', params: { search: query } });
+}
 </script>
 
 <template>
-  <header>
-    <nav class="site-header text-font">
-      <div class="site-header-inner row justify-between items-center">
-        <!-- Site name -->
-        <a href="/movies/" class="site-name"> Diploma MDB </a>
+  <header class="site-header text-font">
+    <div class="site-header-inner">
+      <router-link :to="{ name: 'movies' }" class="site-logo" aria-label="Diploma MDB home">
+        <span class="site-logo-mark" aria-hidden="true">
+          <q-icon name="movie" size="20px" />
+        </span>
+        <span>Diploma <span class="site-logo-accent">MDB</span></span>
+      </router-link>
 
-        <!-- Centered search form -->
-        <div class="search-area row justify-center">
-          <form class="row no-wrap items-center form-container">
-            <input
-              v-model="search"
-              type="text"
-              placeholder="Search"
-              class="search-input"
-              @keyup.enter="onMovieSearch"
-            />
-            <button type="submit" class="search-button" @click="onMovieSearch">
-              <q-icon name="search" />
-            </button>
-          </form>
-        </div>
+      <form class="site-search" role="search" @submit.prevent="onMovieSearch">
+        <input
+          v-model="search"
+          type="search"
+          placeholder="Search movies"
+          aria-label="Search movies"
+          class="site-search-input"
+        />
+        <button type="submit" class="site-search-button" aria-label="Search">
+          <q-icon name="search" size="20px" />
+        </button>
+      </form>
 
-        <!-- User badge -->
-        <div class="user-badge">
-          <UserBadge />
-        </div>
+      <div class="site-user">
+        <UserBadge />
       </div>
-    </nav>
+    </div>
   </header>
 
   <RouterView class="text-font" />
