@@ -1,5 +1,7 @@
 # PopRank
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/P1ayMouse/movies_rating/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/P1ayMouse/movies_rating/tree/master)
+
 A catalog of movies and film people built on a sample of IMDb data: search, movie and person pages, ratings, user sign-up and login.
 
 - **Backend:** Python 3.12, Django 4.2, Django REST Framework, JWT (simplejwt), drf-yasg (Swagger)
@@ -69,9 +71,11 @@ The IMDb files take several gigabytes and the commands save rows one by one, so 
 | Variable | Purpose                                                                         |
 |----------|---------------------------------------------------------------------------------|
 | `DJANGO_SETTINGS_MODULE` | `settings.docker` for running locally in Docker, `settings.prod` for the server |
+| `DJANGO_ALLOWED_HOSTS` | Only for `settings.prod`: the site's domain(s), comma-separated, e.g. `poprank.example.com` |
 | `DJANGO_SECRET_KEY` | Django secret key, also signs login tokens. Generate one with `openssl rand -hex 32`. Required: Django won't start without it |
 | `PY_AUTORELOAD` | `True`: uwsgi restarts when the code changes                                    |
 | `POSTGRES_DB`, `POSTGRES_PASSWORD` | Used by both the Postgres container and Django                                  |
+| `NGINX_PORT`, `NGINX_SSL_PORT`, `NGINX_CONFIG` | Ports and config of nginx. Defaults `8000`, `8443`, `./config/nginx.conf`; on a server `80`, `443`, `./config/nginx.prod.conf` |
 | `TMDB_API_TOKEN` | TMDB token for posters and photos                                               |
 | `SITE_URL` | Base URL for links in emails (default `http://localhost:8000`)                  |
 | `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | SMTP server for emails. Leave `EMAIL_HOST` empty in development                 |
@@ -124,9 +128,44 @@ client/                Vue 3 + Quasar frontend
 config/                urls, wsgi/asgi, nginx configs
 settings/              base -> docker -> prod
 tasks.py               invoke task `runit`: starts the web container
-deploy.py              deploys to EC2 over SSH (run from CircleCI)
 ```
 
-## Deployment
+## Deploying to a server
 
-On every push to `master`, CircleCI (`.circleci/config.yml`) runs `deploy.py`. The script finds EC2 instances tagged `proj=diploma-project`, connects to them over SSH, checks out the deployed commit and restarts `docker compose`.
+Production runs the same containers from `docker-compose.yml`, with ports and the nginx config from `.env`. `docker-compose.prod.yml` on top builds the frontend once instead of running the Vite dev server, adds the certificates and keeps the database and Vite ports closed.
+
+1. Install Docker with Compose 2.24 or newer, clone the repository.
+2. Create `.env` from `.env.example` with production values:
+   ```
+   DJANGO_SETTINGS_MODULE=settings.prod
+   DJANGO_ALLOWED_HOSTS=poprank.example.com
+   DJANGO_SECRET_KEY=<openssl rand -hex 32>
+   POSTGRES_PASSWORD=<a strong password>
+   PY_AUTORELOAD=False
+   SITE_URL=https://poprank.example.com
+   NGINX_PORT=80
+   NGINX_SSL_PORT=443
+   NGINX_CONFIG=./config/nginx.prod.conf
+   ```
+3. Put the HTTPS certificate in `config/certs/` as `certificate.crt` and `private.key` (the folder is git-ignored).
+   Run certbot before starting the site, it needs port 80 for a moment.
+4. Start:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+   ```
+   `client` builds the frontend into `client/dist` and exits, then nginx starts on ports 80 and 443.
+5. Check: `docker compose exec web python manage.py check --deploy`.
+
+To update:
+```bash
+git pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate web client
+```
+`web` restarts with the new code (installing requirements and running migrations on start), `client` rebuilds the frontend.
+
+## Continuous integration
+
+CircleCI (`.circleci/config.yml`) checks every push:
+
+- **backend**: Django tests against Postgres
+- **frontend**: ESLint, Prettier and a production build (`npm run lint:check`, `npm run format:check`, `npm run build` in `client/`)

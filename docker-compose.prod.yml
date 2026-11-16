@@ -1,0 +1,27 @@
+services:
+  db:
+    restart: unless-stopped
+    ports: !reset []
+
+  redis:
+    restart: unless-stopped
+
+  web:
+    restart: unless-stopped
+
+  client:
+    command: /bin/bash -c "cd /src && npm ci && npm run build"
+    volumes:
+      - /src/node_modules
+    ports: !reset []
+
+  nginx:
+    restart: unless-stopped
+    depends_on:
+      client:
+        condition: service_completed_successfully
+      web:
+        condition: service_started
+    volumes:
+      - ./client/dist:/frontend:ro
+      - ./config/certs:/etc/ssl:ro
