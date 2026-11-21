@@ -1,6 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
-from apps.movies.models import Movie, Person, PersonMovie
+from apps.movies.models import Movie, Person, PersonMovie, Rating, UserRating
 from django.urls import reverse
 
 from apps.movies.serializers import PersonSerializer
@@ -159,3 +160,80 @@ class PersonMoviesRetrieveUpdateDestroyViewTest(TestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Movie.objects.filter(pk=self.person_movie.pk).exists())
+
+
+class MyMovieRatingViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(email='rater@example.com', password='pass12345')
+        self.movie = Movie.objects.create(name="Rated Movie", imdb_id="tt7654321", genres=["Drama"])
+        Rating.objects.create(movie_id=self.movie, average_rating=8.0, num_votes=3)
+        self.url = reverse('movies:my-rating', kwargs={'pk': self.movie.pk})
+
+    def test_anonymous_cannot_rate(self):
+        response = self.client.put(self.url, {'score': 7}, format='json')
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(UserRating.objects.exists())
+
+    def test_rate_movie(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.put(self.url, {'score': 4}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['score'], 4)
+        # (8.0 * 3 + 4) / 4
+        self.assertEqual(response.data['average_rating'], 7.0)
+        self.assertEqual(response.data['num_votes'], 4)
+
+        movie = self.client.get(reverse('movies:movie', kwargs={'pk': self.movie.pk})).data
+        self.assertEqual(movie['average_rating'], 7.0)
+        self.assertEqual(movie['num_votes'], 4)
+
+    def test_rating_again_replaces_score(self):
+        self.client.force_authenticate(self.user)
+        self.client.put(self.url, {'score': 4}, format='json')
+        response = self.client.put(self.url, {'score': 10}, format='json')
+        self.assertEqual(response.data['score'], 10)
+        self.assertEqual(UserRating.objects.get(user=self.user, movie=self.movie).score, 10)
+        self.assertEqual(response.data['num_votes'], 4)
+
+    def test_score_must_be_from_1_to_10(self):
+        self.client.force_authenticate(self.user)
+        for score in (0, 11, 'abc', None):
+            response = self.client.put(self.url, {'score': score}, format='json')
+            self.assertEqual(response.status_code, 400, score)
+        self.assertFalse(UserRating.objects.exists())
+
+    def test_get_own_rating(self):
+        self.client.force_authenticate(self.user)
+        self.assertIsNone(self.client.get(self.url).data['score'])
+        UserRating.objects.create(user=self.user, movie=self.movie, score=6)
+        self.assertEqual(self.client.get(self.url).data['score'], 6)
+
+    def test_other_users_rating_is_not_mine(self):
+        other = get_user_model().objects.create_user(email='other@example.com', password='pass12345')
+        UserRating.objects.create(user=other, movie=self.movie, score=2)
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.url)
+        self.assertIsNone(response.data['score'])
+        self.assertEqual(response.data['num_votes'], 4)
+
+    def test_delete_rating(self):
+        self.client.force_authenticate(self.user)
+        self.client.put(self.url, {'score': 4}, format='json')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data['score'])
+        self.assertEqual(response.data['num_votes'], 3)
+        self.assertFalse(UserRating.objects.exists())
+
+    def test_unknown_movie(self):
+        self.client.force_authenticate(self.user)
+        url = reverse('movies:my-rating', kwargs={'pk': self.movie.pk + 1000})
+        self.assertEqual(self.client.put(url, {'score': 5}, format='json').status_code, 404)
+
+    def test_movie_without_imdb_rating(self):
+        movie = Movie.objects.create(name="New Movie", imdb_id="tt0000001", genres=["Drama"])
+        self.client.force_authenticate(self.user)
+        response = self.client.put(reverse('movies:my-rating', kwargs={'pk': movie.pk}), {'score': 9}, format='json')
+        self.assertEqual(response.data['average_rating'], 9.0)
+        self.assertEqual(response.data['num_votes'], 1)

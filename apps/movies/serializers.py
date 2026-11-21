@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from apps.movies.models import Movie, Person, PersonMovie, Rating
+from apps.movies.models import Movie, Person, PersonMovie, Rating, UserRating
 
 
 class MovieSerializer(serializers.ModelSerializer):
     directors = serializers.SerializerMethodField()
-    average_rating = serializers.SerializerMethodField()
-    num_votes = serializers.SerializerMethodField()
+    average_rating = serializers.FloatField(source='total_rating.average', read_only=True)
+    num_votes = serializers.IntegerField(source='total_rating.votes', read_only=True)
 
     class Meta:
         model = Movie
@@ -15,18 +15,6 @@ class MovieSerializer(serializers.ModelSerializer):
 
     def get_directors(self, obj):
         return obj.personmovie_set.filter(category__iexact='director').values_list("person_id__name", flat=True)
-
-    def get_average_rating(self, obj):
-        try:
-            return obj.rating_set.values_list("average_rating", flat=True).get()
-        except Rating.DoesNotExist:
-            return 0.0
-
-    def get_num_votes(self, obj):
-        try:
-            return obj.rating_set.values_list("num_votes", flat=True).get()
-        except Rating.DoesNotExist:
-            return 0
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -46,3 +34,24 @@ class RatingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ['id', 'movie_id', 'average_rating', 'num_votes']
+
+
+class UserRatingSerializer(serializers.ModelSerializer):
+    """Input of PUT my-rating"""
+    class Meta:
+        model = UserRating
+        fields = ['score']
+
+
+class MyMovieRatingSerializer(serializers.ModelSerializer):
+    """The current user's score for a movie, together with the movie's updated totals"""
+    score = serializers.SerializerMethodField()
+    average_rating = serializers.FloatField(source='total_rating.average', read_only=True)
+    num_votes = serializers.IntegerField(source='total_rating.votes', read_only=True)
+
+    class Meta:
+        model = Movie
+        fields = ['score', 'average_rating', 'num_votes']
+
+    def get_score(self, obj):
+        return obj.score_by(self.context['request'].user)

@@ -65,6 +65,46 @@
     font-size: 22px;
   }
 
+  // "Your rating" section. Popcorn buckets in the same gold as the movie score
+  .movie-my-rating {
+    margin-top: 24px;
+  }
+
+  .movie-my-rating-hint {
+    margin: 6px 0 0;
+    color: $muted-text;
+    font-size: 13px;
+
+    a {
+      color: $accent-text;
+      font-weight: 700;
+    }
+  }
+
+  .movie-my-rating-remove {
+    margin-left: 4px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: $accent-text;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid $text-color;
+      outline-offset: 4px;
+    }
+  }
+
+  .movie-my-rating-error {
+    margin: 4px 0 0;
+    color: #b00020;
+    font-size: 13px;
+  }
+
   .movie-credits {
     margin-top: 20px;
     border-radius: $radius;
@@ -123,6 +163,11 @@
       .q-icon {
         font-size: 26px;
       }
+    }
+
+    // Here "Your rating" is its own row of the card's grid, which already has a gap
+    .movie-my-rating {
+      margin-top: 0;
     }
 
     .movie-score-number {

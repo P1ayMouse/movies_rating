@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.movies.models import Movie, Person, PersonMovie, Rating
+from apps.movies.models import Movie, Person, PersonMovie, Rating, UserRating
 
 
 # Register your models here.
@@ -40,3 +40,10 @@ class RatingAdmin(admin.ModelAdmin):
     def get_movie_name(self, obj):
         return f"{obj.movie_id.name} ({obj.movie_id.imdb_id})"
     get_movie_name.short_description = 'Movie'
+
+
+@admin.register(UserRating)
+class UserRatingAdmin(admin.ModelAdmin):
+    list_display = ('movie', 'user', 'score', 'updated_at')
+    search_fields = ('movie__name', 'user__email')
+    raw_id_fields = ('movie', 'user')

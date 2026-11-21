@@ -3,13 +3,14 @@ from django.urls import path
 from apps.movies.api_views import MovieListCreateView, MoviesRetrieveUpdateDestroyView, \
     PersonListCreateView, PersonRetrieveUpdateDestroyView, \
     PersonMovieListCreateView, PersonMoviesRetrieveUpdateDestroyView,\
-    RatingsListCreateView, RatingsRetrieveUpdateDestroyView
+    RatingsListCreateView, RatingsRetrieveUpdateDestroyView, MyMovieRatingView
 
 app_name = 'movies'
 
 urlpatterns = [
     path('', MovieListCreateView.as_view(), name="movie-list"),
     path('<int:pk>/', MoviesRetrieveUpdateDestroyView.as_view(), name="movie"),
+    path('<int:pk>/my-rating/', MyMovieRatingView.as_view(), name="my-rating"),
     path('persons/', PersonListCreateView.as_view(), name="person-list"),
     path('persons/<int:pk>/', PersonRetrieveUpdateDestroyView.as_view(), name="person"),
     path('personmovies/', PersonMovieListCreateView.as_view(), name="person-movies-list"),

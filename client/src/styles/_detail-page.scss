@@ -38,12 +38,13 @@
 
   // Top card: image on the left, details on the right
   .detail-overview {
+    container-type: inline-size;
     display: grid;
-    grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-areas: 'poster summary';
-    gap: 36px;
+    gap: clamp(24px, calc(12px + 2vw), 36px);
     align-items: start;
-    padding: 28px;
+    padding: clamp(24px, calc(20px + 0.667vw), 28px);
     border: 1px solid $border-color;
     border-radius: 16px;
     background: $page-bg;
@@ -103,19 +104,34 @@
     font-size: 14px;
   }
 
+  .detail-media,
+  .detail-summary > * {
+    animation: detail-layout-wide 0.35s ease-out;
+  }
+
   .detail-media {
     grid-area: poster;
+    min-width: clamp(220px, calc(180px + 6.667vw), 260px);
+    max-width: min(420px, 42cqi);
+    height: 100%;
+    aspect-ratio: 2 / 3;
+  }
+
+  // The poster or its placeholder. When the column hits its max width, the column
+  // is still as tall as the details but the poster keeps 2:3 and sits at the top
+  .detail-media > * {
+    display: block;
     width: 100%;
+    height: auto;
     aspect-ratio: 2 / 3;
     overflow: hidden;
     border-radius: $radius;
     background: $card-header-bg;
   }
 
-  // Only the image itself; the placeholder keeps its own flex centring
-  .detail-media .q-img {
-    display: block;
-    width: 100%;
+  // The placeholder keeps its own flex centring
+  .detail-media > .poster-placeholder {
+    display: flex;
   }
 
   // Sections below the top card
@@ -247,6 +263,11 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .detail-media,
+    .detail-summary > * {
+      animation: none !important;
+    }
+
     .movie-tile {
       transition: none;
     }
@@ -258,12 +279,6 @@
   }
 
   @media (max-width: 900px) {
-    .detail-overview {
-      grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
-      gap: 24px;
-      padding: 24px;
-    }
-
     .movie-tiles {
       grid-template-columns: 1fr;
     }
@@ -294,6 +309,19 @@
       display: contents;
     }
 
+    .detail-media,
+    .detail-summary > * {
+      animation: detail-layout-phone 0.35s ease-out;
+    }
+
+    // Phones keep a small poster beside the rating; it doesn't stretch
+    .detail-media {
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      height: auto;
+    }
+
     .detail-heading {
       grid-area: heading;
       min-width: 0;
@@ -306,6 +334,7 @@
     }
 
     .detail-facts,
+    .movie-my-rating,
     .detail-actions {
       grid-column: 1 / -1;
       margin-top: 0;
@@ -320,5 +349,19 @@
     .detail-section {
       margin-top: 28px;
     }
+  }
+}
+
+@keyframes detail-layout-wide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes detail-layout-phone {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
 }

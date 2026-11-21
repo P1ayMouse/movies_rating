@@ -3,6 +3,7 @@ import { pageTitle } from '../brand.js';
 import { QBtn, QIcon, QSpinnerDots, QTable, QTd } from 'quasar';
 import MovieTile from './MovieTile.vue';
 import PersonHoverCard from './PersonHoverCard.vue';
+import MyMovieRating from './MyMovieRating.vue';
 import PosterImage from './PosterImage.vue';
 import { creditRole, formatJob, formatRating, yearOf } from '../format.js';
 
@@ -11,6 +12,7 @@ export default {
   components: {
     MovieTile,
     PersonHoverCard,
+    MyMovieRating,
     PosterImage,
     QBtn,
     QIcon,
@@ -159,6 +161,10 @@ export default {
         if (requestId === this.requestId) this.similarLoading = false;
       }
     },
+    // MyMovieRating passes up the movie's new average and vote count after a vote
+    applyTotals(totals) {
+      Object.assign(this.movie, totals);
+    },
     creditRole,
     formatRating
   }
@@ -214,6 +220,8 @@ export default {
             <dt>{{ movie.directors.length === 1 ? 'Director' : 'Directors' }}</dt>
             <dd>{{ movie.directors.join(', ') }}</dd>
           </dl>
+
+          <my-movie-rating :movie-id="movie.id" @totals="applyTotals" />
 
           <div v-if="movie.imdb_id" class="detail-actions">
             <q-btn

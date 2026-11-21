@@ -1,12 +1,19 @@
 from urllib.parse import unquote
 
-from apps.movies.models import Movie, Person, PersonMovie, Rating
-from apps.movies.serializers import MovieSerializer, PersonSerializer, PersonMovieSerializer, RatingsSerializer
-
-
 from rest_framework import permissions
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.response import Response
+
+from apps.movies.models import Movie, Person, PersonMovie, Rating
+from apps.movies.serializers import (
+    MovieSerializer,
+    MyMovieRatingSerializer,
+    PersonMovieSerializer,
+    PersonSerializer,
+    RatingsSerializer,
+    UserRatingSerializer,
+)
 
 
 class MovieListCreateView(ListCreateAPIView):
@@ -133,3 +140,32 @@ class RatingsRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     ]
     serializer_class = RatingsSerializer
     queryset = Rating.objects.all()
+
+
+class MyMovieRatingView(GenericAPIView):
+    """
+    The current user's score for a movie
+
+    Every answer also carries the movie's new average and vote count, so the page can show them right away
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserRatingSerializer
+    queryset = Movie.objects.all()
+
+    def get(self, request, pk):
+        return self.my_rating_response(self.get_object())
+
+    def put(self, request, pk):
+        movie = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        movie.rate(request.user, serializer.validated_data['score'])
+        return self.my_rating_response(movie)
+
+    def delete(self, request, pk):
+        movie = self.get_object()
+        movie.unrate(request.user)
+        return self.my_rating_response(movie)
+
+    def my_rating_response(self, movie):
+        return Response(MyMovieRatingSerializer(movie, context=self.get_serializer_context()).data)
